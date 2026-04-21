@@ -4,7 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="description" content="سِـتْـر - تطهير الصور، نقل الملفات P2P، والبصمة الرقمية">
-    <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline' https://cdnjs.cloudflare.com; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src 'self' stun.l.google.com:19302 stun1.l.google.com:19302;">
+    <!-- تم تعديل حظر الـ connect-src لضمان عدم عرقلة قنوات اتصال WebRTC -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline' https://cdnjs.cloudflare.com; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src *;">
     <meta name="referrer" content="no-referrer">
     <title>سِـتْـر | حماية ونقل الملفات</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -43,7 +44,6 @@ body{
     background-attachment:fixed;
 }
 
-/* ── Header ── */
 .app { width:100%;max-width:620px;position:relative }
 header { text-align:center;margin-bottom:2.5rem;position:relative }
 .brand {
@@ -53,7 +53,6 @@ header { text-align:center;margin-bottom:2.5rem;position:relative }
     display:flex;align-items:center;justify-content:center;gap:12px;line-height:1;
 }
 
-/* ── Gem floating icon — clean modern ── */
 .gem-wrap {
     position:relative;display:inline-flex;align-items:center;justify-content:center;
     width:52px;height:52px;
@@ -66,7 +65,6 @@ header { text-align:center;margin-bottom:2.5rem;position:relative }
 }
 .tagline { color:var(--muted);font-size:1rem;font-weight:600;margin-top:0.4rem;letter-spacing:.5px }
 
-/* ── Nav ── */
 .nav {
     display:flex;background:var(--surface);border:1px solid var(--border);
     border-radius:var(--r);padding:5px;margin-bottom:1.5rem;gap:4px;
@@ -80,7 +78,6 @@ header { text-align:center;margin-bottom:2.5rem;position:relative }
 .nav-btn.active { background:var(--surface2);color:var(--primary);box-shadow:0 2px 12px rgba(0,0,0,.4),inset 0 1px 0 rgba(255,255,255,.05) }
 .nav-btn:hover:not(.active){ color:var(--text);background:rgba(255,255,255,.04) }
 
-/* ── Card ── */
 .card {
     background:rgba(13,21,32,.9);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);
     border:1px solid var(--border);border-radius:var(--r);padding:2rem;
@@ -90,7 +87,6 @@ header { text-align:center;margin-bottom:2.5rem;position:relative }
 .view.active { display:block }
 @keyframes fadeUp { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:translateY(0)} }
 
-/* ── Drop Zone ── */
 .drop-zone {
     border:2px dashed var(--border2);border-radius:12px;padding:2.5rem 1rem;
     text-align:center;cursor:pointer;transition:var(--t);background:rgba(255,255,255,.015);
@@ -107,7 +103,6 @@ header { text-align:center;margin-bottom:2.5rem;position:relative }
 .drop-title { font-size:1.1rem;font-weight:700;margin-bottom:.4rem }
 .drop-sub { font-size:.85rem;color:var(--muted) }
 
-/* ── Threat Report ── */
 .threat-panel { display:none;margin-bottom:1.5rem;border-radius:12px;overflow:hidden;border:1px solid var(--border) }
 .threat-head { background:var(--surface2);padding:.9rem 1.2rem;display:flex;justify-content:space-between;align-items:center;font-weight:700;font-size:.95rem }
 .badge { padding:3px 12px;border-radius:20px;font-size:.75rem;font-weight:800;background:var(--danger) }
@@ -119,11 +114,9 @@ header { text-align:center;margin-bottom:2.5rem;position:relative }
 .t-val { color:var(--primary);font-weight:600;word-break:break-all }
 .t-val.bad { color:var(--danger) }
 
-/* ── Preview ── */
 .preview-wrap { display:none;text-align:center;margin-top:1.5rem }
 .img-preview { max-width:100%;max-height:220px;border-radius:10px;border:2px solid var(--primary);margin-bottom:1.2rem;box-shadow:0 0 24px var(--primary-glow) }
 
-/* ── Buttons ── */
 .btn {
     width:100%;padding:1.1rem;background:linear-gradient(135deg,var(--primary),var(--blue));
     color:#000;border:none;border-radius:11px;font-size:1rem;font-weight:800;
@@ -140,13 +133,12 @@ header { text-align:center;margin-bottom:2.5rem;position:relative }
 .btn.purple-ghost { background:transparent;border:1.5px solid var(--purple);color:var(--text) }
 .btn.purple-ghost:hover:not(:disabled) { background:rgba(167,139,250,.1);box-shadow:0 4px 16px rgba(167,139,250,.25) }
 
-/* ── P2P Boxes ── */
 .p2p-box { background:rgba(0,0,0,.3);border:1px solid var(--border);padding:1.4rem;border-radius:12px;margin-bottom:1.4rem }
 .step-title { font-size:1rem;color:var(--primary);margin-bottom:1rem;font-weight:700;display:flex;align-items:center;gap:.5rem }
 .code-input {
     width:100%;background:#000;border:1px solid var(--border);color:var(--text);padding:.9rem 1rem;
     border-radius:8px;font-family:'Fira Code',monospace;direction:ltr;outline:none;font-size:.78rem;
-    transition:var(--t);
+    transition:var(--t); word-break: break-all;
 }
 .code-input:focus { border-color:var(--primary);box-shadow:0 0 0 3px var(--primary-dim) }
 .input-mb { margin-bottom:.8rem }
@@ -160,25 +152,29 @@ header { text-align:center;margin-bottom:2.5rem;position:relative }
 .btn-sm.blue:hover { background:var(--blue);color:#000 }
 hr.sep { border:0;border-top:1px solid var(--border);margin:1.5rem 0 }
 
-/* ── QR ── */
+/* ـ تصليح عرض وجودة الـ QR Code ليكون قابلاً للمسح بامتياز ـ */
 .qr-wrap {
-    background:#fff;padding:16px;border-radius:16px;margin:1rem auto;
+    background:#fff;padding:12px;border-radius:12px;margin:1rem auto;
     border:3px solid var(--border2);display:flex;justify-content:center;align-items:center;
-    width:fit-content;max-width:100%;box-shadow:0 0 30px rgba(0,212,160,.2);
+    width:100%; max-width:320px; box-shadow:0 0 30px rgba(0,212,160,.2);
+    overflow: hidden;
+}
+.qr-wrap img, .qr-wrap canvas {
+    max-width:100% !important;
+    height:auto !important;
+    display:block;
+    margin:auto;
 }
 
-/* ── Info Badge ── */
 .info { background:rgba(255,184,48,.08);border:1px solid rgba(255,184,48,.3);color:var(--warning);padding:.9rem 1rem;border-radius:10px;font-size:.85rem;margin-bottom:1rem;line-height:1.6 }
 .info.blue-info { background:var(--blue-dim);border-color:rgba(77,159,255,.3);color:var(--blue) }
 .info.purple-info { background:rgba(167,139,250,.08);border-color:rgba(167,139,250,.3);color:var(--purple) }
 
-/* ── Progress ── */
 .progress-wrap { display:none;width:100%;height:22px;background:#000;border-radius:12px;overflow:hidden;margin-top:1rem;border:1px solid var(--border);position:relative }
 .progress-bar { height:100%;background:linear-gradient(90deg,var(--blue),var(--primary));width:0%;transition:width .15s linear }
 .progress-label { position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:.8rem;font-weight:700;color:#fff;text-shadow:0 1px 3px #000 }
 .status { margin-top:10px;text-align:center;color:var(--muted);font-weight:700;font-size:.9rem }
 
-/* ── Steg Section ── */
 .steg-preview { max-width:100%;max-height:200px;border-radius:10px;border:2px solid var(--purple);box-shadow:0 0 20px rgba(167,139,250,.4);margin-bottom:1rem }
 .steg-label { font-size:.85rem;color:var(--muted);margin-bottom:.4rem;font-weight:600 }
 .steg-textarea {
@@ -196,11 +192,9 @@ hr.sep { border:0;border-top:1px solid var(--border);margin:1.5rem 0 }
 .strength-btn:hover:not(.active) { border-color:var(--muted);color:var(--text) }
 .extract-out { background:#000;border:1px solid var(--border);border-radius:8px;padding:1rem;font-family:'Fira Code',monospace;direction:ltr;text-align:left;font-size:.85rem;min-height:60px;color:var(--primary);word-break:break-all;display:none }
 
-/* ── Footer ── */
 .footer { margin-top:2rem;text-align:center;font-size:.8rem;color:var(--muted);line-height:1.8;padding:1rem }
 .footer strong { color:var(--text) }
 
-/* ── Toast ── */
 .toast {
     position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);
     background:var(--text);color:var(--bg);padding:.9rem 1.8rem;border-radius:30px;
@@ -218,6 +212,7 @@ canvas { display:none }
     .brand{font-size:2.9rem}
     .nav-btn{font-size:.75rem;padding:.65rem .2rem}
     .btn{padding:.95rem;font-size:.95rem}
+    .qr-wrap { padding:8px; max-width:280px; }
 }
 </style>
 </head>
@@ -279,7 +274,7 @@ canvas { display:none }
         </div>
 
         <div id="preview-wrap" class="preview-wrap">
-            <div style="color:var(--primary);font-weight:700;margin-bottom:.8rem">✅ الصورة نظيفة 100% من البيانات الوصفية</div>
+            <div style="color:var(--primary);font-weight:700;margin-bottom:.8rem" id="status-cleaned">✅ الصورة نظيفة 100% من البيانات الوصفية</div>
             <img id="img-preview" class="img-preview" alt="صورة مُطهَّرة">
             <button class="btn" id="btn-dl">⬇️ حفظ على الجهاز</button>
             <button class="btn ghost" id="btn-to-send">📡 إرسال لجهاز آخر (P2P)</button>
@@ -291,7 +286,6 @@ canvas { display:none }
     <section id="view-steg" class="view">
         <div class="info purple-info">🔏 <b>البصمة الرقمية:</b> تُخفي نصاً داخل الصورة بشكل غير مرئي بالعين. مفيدة لإثبات الملكية أو تتبع تسريب الصور.</div>
 
-        <!-- إخفاء نص -->
         <div class="p2p-box">
             <div class="step-title">🖼️ إخفاء نص داخل صورة</div>
             <div class="drop-zone" id="dz-steg" onclick="document.getElementById('fi-steg').click()" style="margin-bottom:1rem;padding:1.5rem 1rem">
@@ -311,7 +305,6 @@ canvas { display:none }
             <button class="btn purple-ghost" id="btn-embed">🔏 تضمين البصمة وحفظ</button>
         </div>
 
-        <!-- استخراج نص -->
         <div class="p2p-box">
             <div class="step-title">🔍 استخراج البصمة من صورة</div>
             <div class="drop-zone" id="dz-extract" onclick="document.getElementById('fi-extract').click()" style="padding:1.5rem 1rem">
@@ -328,24 +321,24 @@ canvas { display:none }
         <div class="p2p-box" id="send-s1">
             <div class="step-title">1️⃣ اختر الملف لإنشاء رمز الاتصال</div>
             <input type="file" id="p2p-fi" style="width:100%;margin-bottom:1rem;background:#000;padding:10px;border-radius:8px;border:1px solid var(--border);color:var(--text)">
-            <button class="btn" id="btn-offer">إنشاء QR Code للإرسال 🔑</button>
+            <button class="btn" id="btn-offer">إنشاء رمز النقل 🔑</button>
         </div>
         <div class="p2p-box" id="send-s2" style="display:none">
             <div class="step-title" style="justify-content:center">2️⃣ اجعل المستلم يمسح هذا الرمز</div>
-            <div class="info">💡 افتح كاميرا الهاتف العادية ووجهها للرمز — ستُنسخ الشفرة تلقائياً.</div>
+            <div class="info">💡 قم بمسح الـ QR باستخدام أي كاميرا هاتف لنقل واستنساخ الشفرة بسهولة.</div>
             <div class="qr-wrap" id="qr-offer"></div>
-            <input type="text" id="offer-code" class="code-input input-mb" readonly>
+            <input type="text" id="offer-code" class="code-input input-mb" onclick="this.select()" readonly>
             <div class="row">
-                <button class="btn-sm" onclick="copyEl('offer-code')">📋 نسخ</button>
+                <button class="btn-sm" onclick="copyEl('offer-code')">📋 نسخ الشفرة</button>
                 <button class="btn-sm" onclick="shareEl('offer-code')">📤 مشاركة</button>
             </div>
             <hr class="sep">
-            <div class="step-title">3️⃣ ضع رد المستلم هنا</div>
-            <input type="text" id="answer-in" class="code-input input-mb" placeholder="ألصق رد المستلم هنا…">
+            <div class="step-title">3️⃣ ضع رد المستلم هنا للبدء</div>
+            <input type="text" id="answer-in" class="code-input input-mb" onclick="this.select()" placeholder="ألصق رد المستلم هنا…">
             <div class="row">
                 <button class="btn-sm blue" onclick="pasteEl('answer-in')">📥 لصق</button>
             </div>
-            <button class="btn" id="btn-connect" style="margin-top:1rem">بدء النقل 🚀</button>
+            <button class="btn" id="btn-connect" style="margin-top:1rem">تأكيد وبدء النقل 🚀</button>
         </div>
         <div class="progress-wrap" id="sp-wrap"><div class="progress-bar" id="sp-bar"></div><div class="progress-label" id="sp-lbl">0%</div></div>
         <div class="status" id="s-status"></div>
@@ -355,22 +348,22 @@ canvas { display:none }
     <section id="view-receive" class="view">
         <div class="p2p-box">
             <div class="step-title">1️⃣ ضع شفرة المُرسل هنا</div>
-            <div class="info blue-info">📷 امسح الـ QR من شاشة المُرسل بكاميرا هاتفك العادية، ثم اضغط لصق.</div>
-            <input type="text" id="offer-in" class="code-input input-mb" placeholder="ألصق شفرة المُرسل…">
+            <div class="info blue-info">📷 امسح الرمز من شاشة هاتف المرسل أو ألصق شفرته يدوياً ثم اضغط إنشاء الرد.</div>
+            <input type="text" id="offer-in" class="code-input input-mb" onclick="this.select()" placeholder="ألصق شفرة المُرسل…">
             <div class="row">
-                <button class="btn-sm blue" onclick="pasteEl('offer-in')">📥 لصق</button>
+                <button class="btn-sm blue" onclick="pasteEl('offer-in')">📥 لصق الشفرة</button>
             </div>
             <button class="btn" id="btn-answer" style="margin-top:1rem">إنشاء رمز الرد 🔐</button>
         </div>
         <div class="p2p-box" id="recv-s2" style="display:none">
             <div class="step-title" style="justify-content:center">2️⃣ اجعل المُرسل يمسح هذا الرد</div>
             <div class="qr-wrap" id="qr-answer"></div>
-            <input type="text" id="answer-code" class="code-input input-mb" readonly>
+            <input type="text" id="answer-code" class="code-input input-mb" onclick="this.select()" readonly>
             <div class="row">
                 <button class="btn-sm" onclick="copyEl('answer-code')">📋 نسخ</button>
                 <button class="btn-sm" onclick="shareEl('answer-code')">📤 مشاركة</button>
             </div>
-            <div style="color:var(--warning);margin-top:1.2rem;text-align:center;font-weight:700">⏳ بانتظار بدء الإرسال…</div>
+            <div style="color:var(--warning);margin-top:1.2rem;text-align:center;font-weight:700">⏳ في انتظار إرسال الملف...</div>
         </div>
         <div class="progress-wrap" id="rp-wrap"><div class="progress-bar" id="rp-bar"></div><div class="progress-label" id="rp-lbl">0%</div></div>
         <div class="status" id="r-status"></div>
@@ -380,8 +373,8 @@ canvas { display:none }
 
 <div class="footer">
     <strong>لماذا سِـتْـر آمن؟</strong><br>
-    لا خوادم تخزين — الاتصال مباشر بين الأجهزة (P2P).<br>
-    جميع العمليات تحدث داخل متصفحك فقط. 🛡️
+    لا توجد خوادم حفظ، الاتصال مشفر بشكل تام وعشوائي مباشر بين الأجهزة (P2P).<br>
+    جميع مهام الحماية وإخفاء البيانات تتم بشكل حصري بداخل متصفحك. 🛡️
 </div>
 </div>
 
@@ -395,7 +388,7 @@ canvas { display:none }
 let toastTimer;
 function toast(msg, type='') {
     const t = document.getElementById('toast');
-    t.textContent = msg;
+    t.innerHTML = msg;
     t.className = `toast show ${type}`;
     clearTimeout(toastTimer);
     toastTimer = setTimeout(() => t.className='toast', 3500);
@@ -404,8 +397,8 @@ function toast(msg, type='') {
 function copyEl(id) {
     const el = document.getElementById(id);
     if (!el.value) return toast('لا يوجد نص للنسخ','err');
-    navigator.clipboard?.writeText(el.value).then(() => toast('✅ تم النسخ','ok')).catch(() => {
-        el.select(); document.execCommand('copy'); toast('✅ تم النسخ','ok');
+    navigator.clipboard?.writeText(el.value).then(() => toast('✅ تم النسخ في الحافظة','ok')).catch(() => {
+        el.select(); document.execCommand('copy'); toast('✅ تم النسخ في الحافظة','ok');
     });
 }
 
@@ -413,7 +406,7 @@ async function pasteEl(id) {
     try {
         const text = await navigator.clipboard.readText();
         if (text) { document.getElementById(id).value = text; toast('✅ تم اللصق','ok'); }
-    } catch { toast('الصق يدوياً (Ctrl+V أو طويل لصق)','err'); }
+    } catch { toast('برجاء اللصق يدوياً، المتصفح يحظر القراءة المباشرة','err'); }
 }
 
 async function shareEl(id) {
@@ -425,7 +418,6 @@ async function shareEl(id) {
     copyEl(id);
 }
 
-/* ── Tab switching ── */
 document.querySelectorAll('.nav-btn').forEach(btn => {
     btn.addEventListener('click', () => {
         document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
@@ -440,53 +432,94 @@ function switchTo(v) {
 }
 
 /* ═══════════════════════════════════════════
-   QR HELPERS
+   QR ROBUST GENERATOR (Fix)
 ═══════════════════════════════════════════ */
 function genQR(containerId, text) {
     const el = document.getElementById(containerId);
     el.innerHTML = '';
-    if (!text || text.length > 2953) { el.innerHTML='<span style="color:var(--warning);font-size:.8rem;padding:8px;">الشفرة كبيرة جداً للـQR — استخدم النسخ اليدوي</span>'; return; }
+    // تقييم أقصى طول يمكن لمكتبة الـ QR احتماله (مستوى التشفير الأدنى L يسمح لغاية 2953 حرف، قمنا بالتقليل لمنع الأعطال)
+    if (!text || text.length > 2950) { 
+        el.innerHTML='<div style="color:var(--warning);font-size:.85rem;padding:12px;text-align:center;border:1px dashed var(--warning);border-radius:8px">الشفرة المنتجة ضخمة جداً، قم باستخدام زر النسخ أسفل الشاشة أو زر المشاركة لإرسالها</div>'; 
+        return; 
+    }
     try {
-        new QRCode(el, { text, width:220, height:220, colorDark:'#000', colorLight:'#fff', correctLevel: QRCode.CorrectLevel.L });
-    } catch { el.innerHTML='<span style="color:var(--danger)">تعذّر رسم الـ QR</span>'; }
+        // توليد QRCode صلب بمتغيرات مناسبة لقراءات الهواتف
+        new QRCode(el, { 
+            text: text, 
+            width: 320, 
+            height: 320, 
+            colorDark: '#000000', 
+            colorLight: '#ffffff', 
+            correctLevel: QRCode.CorrectLevel.L 
+        });
+    } catch(e) { 
+        el.innerHTML='<span style="color:var(--danger)">فشل رسم شفرة الاستجابة السريعة! استخدم النسخ اليدوي.</span>'; 
+    }
 }
 
 /* ═══════════════════════════════════════════
-   SDP COMPRESSION
+   SDP AGGRESSIVE MINIFICATION (CORE FIX FOR QR)
+   تنظيف بصمة اتصال الشبكة بشكل عميق لتقليص الحجم ليصبح الـ QR واضحاً للعمل 
 ═══════════════════════════════════════════ */
+function minifySDP(sdp) {
+    return sdp.split('\r\n').filter(line => {
+        line = line.trim();
+        if (!line) return false;
+        // استبعاد أي امتدادات واحتياطيات شبكات لنجاح النقل السريع
+        if (line.startsWith('a=extmap:')) return false;
+        if (line.startsWith('a=group:')) return false;
+        if (line.startsWith('a=msid-semantic:')) return false;
+        if (line.startsWith('b=')) return false; 
+        if (line.includes('candidate') && line.includes('tcp')) return false; // إخفاء الـ TCP لتوفير المساحة حيث يستخدم UDP غالبًا
+        return true;
+    }).join('\r\n');
+}
+
 async function compressSDP(sdpObj) {
     try {
-        const str = JSON.stringify(sdpObj);
-        if (!window.CompressionStream) return btoa(unescape(encodeURIComponent(str)));
+        // نعتمد هيكلة مصغرة [0 للمُرسل، 1 للمستلم، وبصمة الاتصال مفلترة] 
+        const miniObj = [sdpObj.type === 'offer' ? 0 : 1, minifySDP(sdpObj.sdp)];
+        const str = JSON.stringify(miniObj);
+        
+        if (!window.CompressionStream) return btoa(unescape(encodeURIComponent(str))); // متصفح قديم
+        
         const stream = new Blob([str]).stream().pipeThrough(new CompressionStream('deflate-raw'));
         const buf = await new Response(stream).arrayBuffer();
         const bytes = new Uint8Array(buf);
         let bin = '';
         for (let i = 0; i < bytes.length; i++) bin += String.fromCharCode(bytes[i]);
         return btoa(bin);
-    } catch { return btoa(unescape(encodeURIComponent(JSON.stringify(sdpObj)))); }
-}
-
-async function decompressSDP(b64) {
-    try {
-        const bin = atob(b64.trim());
-        if (!window.DecompressionStream) return JSON.parse(decodeURIComponent(escape(bin)));
-        const bytes = new Uint8Array(bin.length);
-        for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
-        const stream = new Blob([bytes]).stream().pipeThrough(new DecompressionStream('deflate-raw'));
-        const text = await new Response(stream).text();
-        return JSON.parse(text);
-    } catch {
-        // fallback: try old deflate
-        try {
-            const bin = atob(b64.trim());
-            return JSON.parse(decodeURIComponent(escape(bin)));
-        } catch { throw new Error('invalid_sdp'); }
+    } catch { 
+        return btoa(unescape(encodeURIComponent(JSON.stringify(sdpObj)))); 
     }
 }
 
+async function decompressSDP(b64) {
+    let text = '';
+    try {
+        const bin = atob(b64.trim());
+        if (!window.DecompressionStream) {
+            text = decodeURIComponent(escape(bin));
+        } else {
+            const bytes = new Uint8Array(bin.length);
+            for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+            const stream = new Blob([bytes]).stream().pipeThrough(new DecompressionStream('deflate-raw'));
+            text = await new Response(stream).text();
+        }
+    } catch {
+        // حائط صد ضد محاولات الفك الخاطئة
+        try { text = decodeURIComponent(escape(atob(b64.trim()))); } catch { throw new Error('فشل تفسير النص'); }
+    }
+    
+    let parsed = JSON.parse(text);
+    if (Array.isArray(parsed)) {
+        return { type: parsed[0] === 0 ? 'offer' : 'answer', sdp: parsed[1] };
+    }
+    return parsed;
+}
+
 /* ═══════════════════════════════════════════
-   EXIF EXTRACTION (read-only, no writes)
+   EXIF EXTRACTION 
 ═══════════════════════════════════════════ */
 function extractEXIF(buffer) {
     const view = new DataView(buffer);
@@ -545,10 +578,12 @@ document.getElementById('fi-img').addEventListener('change', async e => {
     const panel = document.getElementById('threat-panel');
     const body  = document.getElementById('threat-body');
     const badge = document.getElementById('badge');
+    document.getElementById('status-cleaned').style.display = 'none'; // نخفيه حتى اكتمال التطهير
+    
     panel.style.display = 'block';
-    body.innerHTML = '<div style="text-align:center;color:var(--muted)">جاري الفحص…</div>';
-    badge.textContent = 'فحص…';
-    badge.className = 'badge';
+    body.innerHTML = '<div style="text-align:center;color:var(--muted)">جاري الفحص السريع للملف…</div>';
+    badge.textContent = 'يتم الفحص…';
+    badge.className = 'badge warn';
 
     let risks = 0, html = '';
 
@@ -566,26 +601,26 @@ document.getElementById('fi-img').addEventListener('change', async e => {
             if (exif.DateTime)        add('التاريخ',  exif.DateTime);
             if (exif.DateTimeOriginal)add('الالتقاط', exif.DateTimeOriginal);
             if (exif.Artist)          add('المالك',   exif.Artist);
-            if (exif.ImageUniqueID)   add('معرّف فريد',exif.ImageUniqueID);
-            if (exif.GPS)             add('الموقع',  '⚠️ إحداثيات GPS موجودة!', true);
+            if (exif.ImageUniqueID)   add('المُعَرِّف',exif.ImageUniqueID);
+            if (exif.GPS)             add('الموقع',  '⚠️ إحداثيات موقع GPS مخزنة!', true);
         }
 
         if (risks === 0) {
-            html = '<div style="color:var(--primary);text-align:center">✅ لا بيانات مرئية — سيتم التطهير الوقائي</div>';
-            badge.textContent = 'آمن مبدئياً';
+            html = '<div style="color:var(--primary);text-align:center">✅ الصورة تبدو آمنة، سيتم إعادة رسم البكسلات وقائياً لضمان النظافة.</div>';
+            badge.textContent = 'تبدو نظيفة';
             badge.className = 'badge safe';
         } else {
-            badge.textContent = `${risks} مخاطر`;
+            badge.textContent = `${risks} مسارات مسربة`;
             badge.className = 'badge';
         }
     } catch {
-        html = '<div style="color:var(--warning);text-align:center">صيغة غير قياسية — تطهير إجباري</div>';
-        badge.textContent = 'تطهير إجباري';
+        html = '<div style="color:var(--warning);text-align:center">بيانات غير قياسية! سيتم الحذف الشامل للمسارات...</div>';
+        badge.textContent = 'تطهير قسري';
         badge.className = 'badge warn';
     }
     body.innerHTML = html;
 
-    // ── Sanitize: redraw via canvas (destroys all metadata) ──
+    // Canvas الرسم الإجباري للتدمير التام
     const reader = new FileReader();
     reader.onload = ev => {
         const img = new Image();
@@ -595,16 +630,17 @@ document.getElementById('fi-img').addEventListener('change', async e => {
             const ctx = c.getContext('2d');
             ctx.drawImage(img, 0, 0);
             c.toBlob(blob => {
-                if (!blob) return toast('فشل التطهير — حاول مجدداً','err');
-                const safeName = 'Safe_' + file.name.replace(/[^a-zA-Z0-9._\u0600-\u06FF]/g,'_');
+                if (!blob) return toast('فشل عملية التطهير — الصورة قد تكون تالفة','err');
+                const safeName = 'SITR_Secured_' + file.name.replace(/[^a-zA-Z0-9._\u0600-\u06FF]/g,'_');
                 cleanFile = new File([blob], safeName, { type: 'image/jpeg' });
                 document.getElementById('img-preview').src = URL.createObjectURL(blob);
+                document.getElementById('status-cleaned').style.display = 'block'; // اظهر التأكيد
                 document.getElementById('preview-wrap').style.display = 'block';
                 document.getElementById('dz-img').style.display = 'none';
-                toast('✨ تم التطهير','ok');
+                toast('✨ اكتمل تطهير الصورة بنجاح','ok');
             }, 'image/jpeg', 0.95);
         };
-        img.onerror = () => toast('تعذّر قراءة الصورة','err');
+        img.onerror = () => toast('عذراً، فشلت قراءة صيغة هذه الصورة','err');
         img.src = ev.target.result;
     };
     reader.readAsDataURL(file);
@@ -616,7 +652,7 @@ document.getElementById('btn-dl').addEventListener('click', () => {
     a.href = URL.createObjectURL(cleanFile);
     a.download = cleanFile.name;
     a.click();
-    setTimeout(() => URL.revokeObjectURL(a.href), 10000);
+    setTimeout(() => URL.revokeObjectURL(a.href), 15000); // تنظيف المؤشر لمنع التسريب بالرام
 });
 
 document.getElementById('btn-to-send').addEventListener('click', () => {
@@ -634,16 +670,14 @@ document.getElementById('btn-to-steg').addEventListener('click', () => {
     preview.src = URL.createObjectURL(cleanFile);
     preview.style.display = 'block';
     document.getElementById('dz-steg').style.display = 'none';
-    // store as steg source
     window._stegSrc = cleanFile;
     switchTo('steg');
 });
 
 /* ═══════════════════════════════════════════
-   STEGANOGRAPHY (LSB — in-browser)
-   Embeds text in Least Significant Bits of red channel
+   STEGANOGRAPHY (LSB Fix)
 ═══════════════════════════════════════════ */
-let stegBits = 1; // bits per pixel
+let stegBits = 1; 
 document.querySelectorAll('.strength-btn').forEach(btn => {
     btn.addEventListener('click', () => {
         document.querySelectorAll('.strength-btn').forEach(b=>b.classList.remove('active'));
@@ -668,8 +702,8 @@ document.getElementById('fi-steg').addEventListener('change', e => {
 document.getElementById('btn-embed').addEventListener('click', () => {
     const file = window._stegSrc;
     const msg  = document.getElementById('steg-text').value;
-    if (!file) return toast('اختر صورة أولاً','err');
-    if (!msg.trim()) return toast('أدخل النص المراد إخفاؤه','err');
+    if (!file) return toast('يرجى اختيار صورة أولاً لتضمين البصمة','err');
+    if (!msg.trim()) return toast('أدخل النص السري ليتم إخفاؤه بداخل البكسلات','err');
 
     const reader = new FileReader();
     reader.onload = ev => {
@@ -682,35 +716,30 @@ document.getElementById('btn-embed').addEventListener('click', () => {
             const id = ctx.getImageData(0, 0, c.width, c.height);
             const data = id.data;
 
-            // Encode: prepend 4-byte length, then UTF-8 bytes
             const encoded = new TextEncoder().encode(msg);
             const fullLen = encoded.length;
-            if (fullLen > 65535) return toast('النص طويل جداً','err');
-            // payload: [bits_marker(1byte), lenHi, lenLo, ...data]
+            if (fullLen > 65535) return toast('تحذير! رسالة البصمة طويلة للغاية، قم باختصارها','err');
+            
             const payload = new Uint8Array(3 + fullLen);
-            payload[0] = stegBits; // store bits per channel so extraction knows
+            payload[0] = stegBits; 
             payload[1] = (fullLen >> 8) & 0xFF;
             payload[2] = fullLen & 0xFF;
             payload.set(encoded, 3);
 
-            // Check capacity
             const maxBytes = Math.floor((data.length / 4) * stegBits / 8);
-            if (payload.length > maxBytes) return toast('الصورة صغيرة جداً لاستيعاب النص','err');
+            if (payload.length > maxBytes) return toast('أبعاد الصورة الحالية غير قادرة على استيعاب كل هذا النص، استخدم صورة أكبر أو ارفع متانة الإخفاء','err');
 
-            // LSB embed in R channel only (stegBits LSBs per pixel)
             const mask = (1 << stegBits) - 1;
             let bitPos = 0;
-            // build bit stream
             const bits = [];
             for (const byte of payload) {
                 for (let b = 7; b >= 0; b--) bits.push((byte >> b) & 1);
             }
-            // pack stegBits bits per pixel R channel
+            
             let bi = 0;
             for (let p = 0; p < data.length / 4 && bi < bits.length; p++) {
                 let val = 0;
                 for (let k = 0; k < stegBits && bi < bits.length; k++, bi++) val = (val << 1) | bits[bi];
-                // pad if needed
                 val = val << (stegBits - Math.min(stegBits, bits.length - (bi - stegBits)));
                 data[p * 4] = (data[p * 4] & ~mask) | (val & mask);
             }
@@ -719,13 +748,13 @@ document.getElementById('btn-embed').addEventListener('click', () => {
             c.toBlob(blob => {
                 const a = document.createElement('a');
                 a.href = URL.createObjectURL(blob);
-                a.download = 'Watermarked_' + (file.name || 'image.png').replace(/\.[^.]+$/, '.png');
+                a.download = 'Sitr_Watermarked_' + (file.name || 'image.png').replace(/\.[^.]+$/, '.png');
                 a.click();
-                setTimeout(() => URL.revokeObjectURL(a.href), 10000);
-                toast('✅ تم التضمين والحفظ كـ PNG','ok');
-            }, 'image/png'); // MUST save as PNG to preserve LSBs
+                setTimeout(() => URL.revokeObjectURL(a.href), 15000);
+                toast('✅ تم طبع البصمة الخفية وتخزينها كملف PNG آمن','ok');
+            }, 'image/png'); // الحفظ بصيغة PNG حصري لحماية البتات المغروسة من ضغط JPG
         };
-        img.onerror = () => toast('تعذّر قراءة الصورة','err');
+        img.onerror = () => toast('عفواً، فشلت قراءة خوارزميات الألوان لهذه الصورة','err');
         img.src = ev.target.result;
     };
     reader.readAsDataURL(file);
@@ -735,7 +764,9 @@ document.getElementById('fi-extract').addEventListener('change', e => {
     const file = e.target.files[0]; if (!file) return;
     const out = document.getElementById('extract-out');
     out.style.display = 'block';
-    out.textContent = 'جاري الفحص…';
+    out.textContent = 'جاري المسح المعمق للبحث عن بصمة مستترة…';
+    out.style.color = 'var(--warning)';
+    
     const reader = new FileReader();
     reader.onload = ev => {
         const img = new Image();
@@ -746,7 +777,6 @@ document.getElementById('fi-extract').addEventListener('change', e => {
             ctx.drawImage(img, 0, 0);
             const data = ctx.getImageData(0, 0, c.width, c.height).data;
 
-            // Try bits 1, 2, 3 auto-detect
             let found = false;
             for (const bpp of [1, 2, 3]) {
                 const mask = (1 << bpp) - 1;
@@ -762,27 +792,31 @@ document.getElementById('fi-extract').addEventListener('change', e => {
                     bytes.push(b);
                 }
                 if (bytes.length < 3) continue;
-                // Check marker
+                
                 const markerBpp = bytes[0];
                 if (markerBpp !== bpp) continue;
+                
                 const len = (bytes[1] << 8) | bytes[2];
-                if (len > 2000 || len === 0) continue;
+                // الحماية من الانهيار (أطوال غير منطقية تعني عدم وجود داتا صالحة)
+                if (len > 5000 || len === 0 || len > bytes.length - 3) continue;
+                
                 try {
                     const textBytes = new Uint8Array(bytes.slice(3, 3 + len));
                     const text = new TextDecoder().decode(textBytes);
+                    // اختبار بسيط لمنع عرض نص عشوائي متبقي (نقبل الإنجليزي، العربي و الرموز الأساسية)
                     if (/[^\x00-\x7F\u0600-\u06FF\u0020-\u007E]/.test(text) && !/[\u0600-\u06FF]/.test(text)) continue;
                     out.style.color = 'var(--primary)';
-                    out.textContent = `[قوة الإخفاء: ${bpp} bit] ${text}`;
+                    out.innerHTML = `<span style="color:var(--muted);font-size:.7rem">شفرة مستردة [قوة ${bpp}]:</span><br/>${text}`;
                     found = true;
                     break;
                 } catch {}
             }
             if (!found) {
-                out.style.color = 'var(--muted)';
-                out.textContent = 'لم يُعثر على بصمة مخفية في هذه الصورة.';
+                out.style.color = 'var(--danger)';
+                out.textContent = '❌ لا تحتوي الصورة على أي بصمة رقمية تم إنشاؤها عبر هذا النظام.';
             }
         };
-        img.onerror = () => { out.textContent = 'تعذّر قراءة الصورة'; };
+        img.onerror = () => { out.textContent = 'خطأ! هذه الصورة تالفة أو محميّة بقفل عرض.'; out.style.color = 'var(--danger)'; };
         img.src = ev.target.result;
     };
     reader.readAsDataURL(file);
@@ -790,7 +824,7 @@ document.getElementById('fi-extract').addEventListener('change', e => {
 });
 
 /* ═══════════════════════════════════════════
-   WebRTC P2P FILE TRANSFER
+   WebRTC P2P FILE TRANSFER (Stability and Fixes)
 ═══════════════════════════════════════════ */
 const RTC_CFG = {
     iceServers: [
@@ -798,7 +832,8 @@ const RTC_CFG = {
         { urls: 'stun:stun1.l.google.com:19302' }
     ]
 };
-const CHUNK = 64 * 1024;
+// تقليص حجم الشنك لـ 16KB لتخفيض احتمالية تسريب الباكيتات وفشل النقل
+const CHUNK = 16 * 1024;
 let pc, dc;
 
 function closePeer() {
@@ -807,67 +842,68 @@ function closePeer() {
     pc = null; dc = null;
 }
 
-/* ── Sender ── */
+/* ── المرسل (Sender) ── */
 document.getElementById('btn-offer').addEventListener('click', async () => {
     const file = document.getElementById('p2p-fi').files[0];
-    if (!file) return toast('اختر ملفاً أولاً','err');
+    if (!file) return toast('يرجى تحديد ملف أو صورة أولاً','err');
 
     closePeer();
     document.getElementById('btn-offer').disabled = true;
     document.getElementById('send-s2').style.display = 'block';
-    document.getElementById('s-status').textContent = 'جاري إنشاء رمز الاتصال…';
+    
+    document.getElementById('s-status').innerHTML = 'جاري الاتصال بالسحابة الجذعية وتأمين مسار...<br><small style="color:var(--muted)">قد يستغرق 2-5 ثوانٍ لجمع مسارات الآي بي</small>';
 
     pc = new RTCPeerConnection(RTC_CFG);
-    dc = pc.createDataChannel('sitr', { ordered: true });
+    dc = pc.createDataChannel('sitr-stream', { ordered: true });
     dc.binaryType = 'arraybuffer';
     setupSender(file);
 
     pc.onicecandidate = async ev => {
-        if (ev.candidate) return;
+        // ننتظر حتى تكتمل إحداثيات ومسارات المرور كلها لإنشاء شفرة ضخمة واحدة قوية (ev.candidate === null)
+        if (ev.candidate) return; 
         try {
             const compressed = await compressSDP(pc.localDescription);
             document.getElementById('offer-code').value = compressed;
             genQR('qr-offer', compressed);
-            document.getElementById('s-status').textContent = 'جاهز — انتظر رد المستلم';
-        } catch { toast('خطأ في ضغط SDP','err'); }
-    };
-    pc.onicegatheringstatechange = () => {
-        if (pc.iceGatheringState === 'complete') {
-            pc.onicecandidate = null; // stop further events
-        }
+            document.getElementById('s-status').innerHTML = '<span style="color:var(--warning)">✅ جاهز — أعطِ هذا الـ QR أو الشفرة للمستلم ليقوم بالرد...</span>';
+        } catch { toast('وقع خطأ تقني في تشفير الـ SDP للمسار المباشر','err'); }
     };
 
     try {
         const offer = await pc.createOffer();
         await pc.setLocalDescription(offer);
-    } catch (e) { toast('خطأ في إنشاء الـ Offer: ' + e.message, 'err'); closePeer(); }
+    } catch (e) { toast('خطأ فشل بناء الإحداثيات: ' + e.message, 'err'); closePeer(); }
 });
 
 document.getElementById('btn-connect').addEventListener('click', async () => {
     const code = document.getElementById('answer-in').value.trim();
-    if (!code) return toast('أدخل الشفرة','err');
-    if (!pc) return toast('أنشئ الرمز أولاً','err');
+    if (!code) return toast('يرجى لصق الرد المُرسل أولاً','err');
+    if (!pc) return toast('يجب أن تقوم بتوليد الشفرة وتأسيس إحداثية الاتصال أولاً!','err');
     try {
+        document.getElementById('btn-connect').disabled = true;
         const sdp = await decompressSDP(code);
         await pc.setRemoteDescription(new RTCSessionDescription(sdp));
-        document.getElementById('s-status').textContent = 'جاري الاتصال…';
-    } catch { toast('الشفرة غير صالحة','err'); }
+        document.getElementById('s-status').innerHTML = 'جاري الاتصال والاندماج 🔗...';
+    } catch { 
+        document.getElementById('btn-connect').disabled = false;
+        toast('المعطيات المزودة في الرد غير متطابقة، تأكد من النسخ الصحيح','err'); 
+    }
 });
 
 function setupSender(file) {
     dc.onopen = () => {
-        document.getElementById('s-status').textContent = 'متصل — جاري النقل…';
+        document.getElementById('s-status').innerHTML = '<span style="color:var(--blue)">متصل بنجاح — جاري الدفق الجذعي الآمن (P2P)…</span>';
         document.getElementById('sp-wrap').style.display = 'block';
         dc.send(JSON.stringify({ type:'meta', name:file.name, size:file.size, mime:file.type || 'application/octet-stream' }));
 
         let offset = 0;
-        dc.bufferedAmountLowThreshold = 512 * 1024;
+        dc.bufferedAmountLowThreshold = 256 * 1024;
         const fr = new FileReader();
 
         const sendNext = () => {
             if (offset >= file.size) {
                 dc.send(JSON.stringify({ type:'eof' }));
-                document.getElementById('s-status').innerHTML = "<span style='color:var(--primary)'>✅ اكتمل الإرسال!</span>";
+                document.getElementById('s-status').innerHTML = "<span style='color:var(--primary);font-size:1.1rem;'>✅ 🚀 تم إرسال الملف المباشر للمستلم بتشفير أقصى!</span>";
                 return;
             }
             const slice = file.slice(offset, offset + CHUNK);
@@ -881,26 +917,28 @@ function setupSender(file) {
                 const pct = Math.min(100, Math.round(offset / file.size * 100));
                 document.getElementById('sp-bar').style.width = pct + '%';
                 document.getElementById('sp-lbl').textContent = pct + '%';
+                
+                // منع التخمة العالية عن طريق تعليق القراءة حتى يستلم متصفح المرسل من الـ Buffer الداخلي
                 if (dc.bufferedAmount > dc.bufferedAmountLowThreshold) {
                     dc.onbufferedamountlow = () => { dc.onbufferedamountlow = null; sendNext(); };
                 } else sendNext();
-            } catch (e) { toast('خطأ في الإرسال: ' + e.message, 'err'); }
+            } catch (e) { toast('توقف تدفق الإرسال الفجائي، تم كسر الاتصال بالخطأ!', 'err'); }
         };
         sendNext();
     };
 
-    dc.onerror = e => toast('خطأ في القناة: ' + (e.message||''), 'err');
-    dc.onclose = () => { if (document.getElementById('s-status').textContent.includes('جاري')) toast('اتصال منقطع','err'); };
+    dc.onerror = e => toast('إشارة البيانات ضعيفة: ' + (e.message||'غير متوقع'), 'err');
+    dc.onclose = () => { if (document.getElementById('s-status').textContent.includes('جاري')) toast('المتلقي قام بإنهاء جلسة الإتصال...','warn'); };
 }
 
-/* ── Receiver ── */
+/* ── المستلم (Receiver) ── */
 document.getElementById('btn-answer').addEventListener('click', async () => {
     const code = document.getElementById('offer-in').value.trim();
-    if (!code) return toast('أدخل الشفرة','err');
+    if (!code) return toast('من فضلك، أضف شفرة المرسل لتكوين الربط!','err');
 
     closePeer();
     document.getElementById('btn-answer').disabled = true;
-    document.getElementById('r-status').textContent = 'جاري معالجة الشفرة…';
+    document.getElementById('r-status').innerHTML = 'جاري التفاوض الهندسي مع الشفرة...';
 
     try {
         const sdp = await decompressSDP(code);
@@ -913,14 +951,14 @@ document.getElementById('btn-answer').addEventListener('click', async () => {
         };
 
         pc.onicecandidate = async ev => {
-            if (ev.candidate) return;
+            if (ev.candidate) return; // Wait fully
             try {
                 const compressed = await compressSDP(pc.localDescription);
                 document.getElementById('answer-code').value = compressed;
                 genQR('qr-answer', compressed);
                 document.getElementById('recv-s2').style.display = 'block';
-                document.getElementById('r-status').textContent = 'بانتظار الإرسال…';
-            } catch { toast('خطأ في ضغط SDP','err'); }
+                document.getElementById('r-status').innerHTML = '✅ <span style="color:var(--primary)">نجاح المعالجة. يجب على المرسل الآن مسح/أخذ ردك</span>';
+            } catch { toast('لم يتمكن من كتابة بصمة الرد التقني','err'); }
         };
 
         await pc.setRemoteDescription(new RTCSessionDescription(sdp));
@@ -928,7 +966,7 @@ document.getElementById('btn-answer').addEventListener('click', async () => {
         await pc.setLocalDescription(ans);
     } catch (e) {
         document.getElementById('btn-answer').disabled = false;
-        toast('شفرة غير صالحة: ' + (e.message||''), 'err');
+        toast('يبدو أن بصمة المرسل تالفة أو مجتزأة. راجع شفرتك!', 'err');
     }
 });
 
@@ -941,17 +979,18 @@ function setupReceiver() {
             const msg = JSON.parse(ev.data);
             if (msg.type === 'meta') {
                 meta = msg;
-                document.getElementById('r-status').textContent = `استقبال: ${meta.name}`;
+                document.getElementById('r-status').innerHTML = `⏳ <b>تنزيل التدفق المباشر للملف:</b> <span style="color:var(--primary)">${meta.name}</span>`;
             } else if (msg.type === 'eof') {
                 const blob = new Blob(buffer, { type: meta?.mime || 'application/octet-stream' });
                 const url  = URL.createObjectURL(blob);
                 const a = document.createElement('a');
-                a.href = url; a.download = meta?.name || 'received_file';
+                a.href = url; a.download = meta?.name || 'SITR_Transfer_' + Date.now();
                 document.body.appendChild(a); a.click(); document.body.removeChild(a);
-                setTimeout(() => URL.revokeObjectURL(url), 10000);
-                document.getElementById('r-status').innerHTML = "<span style='color:var(--primary)'>✅ اكتمل الاستقبال!</span>";
-                buffer = []; received = 0;
-                toast('✅ تم استلام الملف','ok');
+                setTimeout(() => URL.revokeObjectURL(url), 15000);
+                
+                document.getElementById('r-status').innerHTML = "<span style='color:var(--primary);font-size:1.1rem'>✅ اكتمل استقبال الباكيتات 100%! تحقق من التنزيلات.</span>";
+                buffer = []; received = 0; // مسح الكاش من الرام
+                toast('🎉 اكتمل الاستلام بصورة نهائية!','ok');
             }
         } else {
             buffer.push(ev.data);
@@ -964,7 +1003,7 @@ function setupReceiver() {
         }
     };
 
-    dc.onerror = e => toast('خطأ في الاستقبال: ' + (e.message||''), 'err');
+    dc.onerror = e => toast('تشويش وانقطاع أدى لتعطل الباكيتات. (مألوف إذا ابتعدت عن الراوتر)', 'err');
 }
 </script>
 </body>
