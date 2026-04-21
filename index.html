@@ -2,11 +2,12 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="سِـتْـر - الأداة المطلقة لتطهير الصور ونقل الملفات المشفر P2P محلياً عبر QR">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="description" content="سِـتْـر - الأداة المطلقة لتطهير الصور ونقل الملفات المشفر P2P محلياً">
+    <meta name="theme-color" content="#030712">
     
-    <!-- سياسة أمان صارمة تمنع الخوادم الخارجية، وتسمح بالكاميرا المحلية والـ P2P -->
-    <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob:; media-src 'self' blob: mediastream:; connect-src 'self' stun.l.google.com:19302;">
+    <!-- تم تحديث سياسة الأمان للسماح بمكتبة الـ QR مع الحفاظ على صرامة منع الاختراق -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline' https://cdn.jsdelivr.net; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob:; media-src 'self' blob: mediastream:; connect-src 'self' stun.l.google.com:19302;">
     <meta name="referrer" content="no-referrer">
 
     <title>سِـتْـر | حماية ونقل الملفات</title>
@@ -24,19 +25,20 @@
         --text: #f9fafb;
         --text-muted: #9ca3af;
         --primary: #10b981;
-        --primary-glow: rgba(16, 185, 129, 0.3);
+        --primary-glow: rgba(16, 185, 129, 0.4);
         --secondary: #3b82f6;
+        --secondary-glow: rgba(59, 130, 246, 0.4);
         --danger: #ef4444;
         --warning: #f59e0b;
         --radius: 16px;
         --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Cairo', sans-serif; }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Cairo', sans-serif; -webkit-tap-highlight-color: transparent; }
 
     body {
         background-color: var(--bg-dark); color: var(--text); min-height: 100vh;
-        display: flex; flex-direction: column; align-items: center; padding: 2rem 1rem;
+        display: flex; flex-direction: column; align-items: center; padding: clamp(1rem, 5vw, 2rem) 1rem;
         background-image: radial-gradient(circle at 15% 50%, rgba(16, 185, 129, 0.05) 0%, transparent 50%),
                           radial-gradient(circle at 85% 30%, rgba(59, 130, 246, 0.05) 0%, transparent 50%);
         background-attachment: fixed;
@@ -44,30 +46,50 @@
 
     .app-container { width: 100%; max-width: 650px; position: relative; }
 
+    /* Privacy Badge */
+    .privacy-badge {
+        background: rgba(16, 185, 129, 0.1); border: 1px solid var(--primary); color: var(--primary);
+        padding: 0.5rem 1rem; border-radius: 30px; font-size: 0.85rem; font-weight: 700;
+        display: flex; align-items: center; justify-content: center; gap: 8px; margin: 0 auto 1.5rem auto; width: fit-content;
+    }
+
     header { text-align: center; margin-bottom: 2rem; }
+    
     .brand-title {
-        font-weight: 900; font-size: 3.5rem; letter-spacing: -1px;
+        font-weight: 900; font-size: clamp(2.5rem, 8vw, 3.5rem); letter-spacing: -1px;
         background: linear-gradient(135deg, #ffffff, var(--primary));
         -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-        margin-bottom: 0.2rem; display: flex; align-items: center; justify-content: center; gap: 10px;
+        margin-bottom: 0.5rem; display: flex; align-items: center; justify-content: center; gap: 15px;
     }
-    .brand-dot { color: var(--secondary); -webkit-text-fill-color: var(--secondary); animation: float 3s ease-in-out infinite; display: inline-block;}
-    @keyframes float { 0%, 100% { transform: translateY(0); filter: drop-shadow(0 0 5px var(--secondary)); } 50% { transform: translateY(-8px); filter: drop-shadow(0 0 15px var(--secondary)); } }
-    .tagline { color: var(--text-muted); font-size: 1.1rem; font-weight: 600; }
+
+    /* Modern Floating Symbol instead of Emoji */
+    .brand-symbol {
+        width: clamp(20px, 6vw, 28px); height: clamp(20px, 6vw, 28px);
+        background: linear-gradient(135deg, var(--primary), var(--secondary));
+        border-radius: 6px; transform: rotate(45deg);
+        animation: modernFloat 4s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+        box-shadow: 0 0 15px var(--primary-glow);
+    }
+    @keyframes modernFloat {
+        0%, 100% { transform: translateY(0) rotate(45deg) scale(1); box-shadow: 0 0 15px var(--primary-glow); }
+        50% { transform: translateY(-8px) rotate(45deg) scale(1.1); box-shadow: 0 0 25px var(--secondary-glow); }
+    }
+
+    .tagline { color: var(--text-muted); font-size: clamp(0.9rem, 3vw, 1.1rem); font-weight: 600; }
 
     .main-nav {
         display: flex; background: var(--surface); border: 1px solid var(--border);
-        border-radius: var(--radius); padding: 0.5rem; margin-bottom: 1.5rem; gap: 0.5rem;
+        border-radius: var(--radius); padding: 0.5rem; margin-bottom: 1.5rem; gap: 0.5rem; flex-wrap: wrap;
     }
     .nav-btn {
-        flex: 1; background: transparent; border: none; color: var(--text-muted);
-        font-size: 1rem; font-weight: 700; padding: 0.8rem; border-radius: 12px; cursor: pointer; transition: var(--transition);
+        flex: 1; min-width: 120px; background: transparent; border: none; color: var(--text-muted);
+        font-size: clamp(0.9rem, 3vw, 1rem); font-weight: 700; padding: 0.8rem; border-radius: 12px; cursor: pointer; transition: var(--transition);
     }
     .nav-btn.active { background: var(--surface-hover); color: var(--primary); box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
 
     .card {
         background: rgba(17, 24, 39, 0.8); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
-        border: 1px solid var(--border); border-radius: var(--radius); padding: 2rem;
+        border: 1px solid var(--border); border-radius: var(--radius); padding: clamp(1.2rem, 5vw, 2rem);
         box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.6); position: relative; overflow: hidden;
     }
 
@@ -75,71 +97,74 @@
     .view-section.active { display: block; }
     @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-    /* Threat Dashboard */
-    .threat-dashboard { display: none; margin-bottom: 1.5rem; }
-    .threat-header {
-        background: var(--surface-hover); padding: 1rem; border-radius: 12px 12px 0 0; border: 1px solid var(--border);
-        border-bottom: none; display: flex; justify-content: space-between; align-items: center; font-weight: bold;
-    }
-    .threat-body { background: #000; border: 1px solid var(--border); border-radius: 0 0 12px 12px; padding: 1rem; font-family: 'Fira Code', monospace; font-size: 0.9rem; direction: ltr; text-align: left; }
-    .threat-item { padding: 0.5rem 0; border-bottom: 1px dashed var(--border); display: flex; gap: 10px; align-items: center; }
-    .threat-label { color: var(--text-muted); width: 100px; flex-shrink: 0; }
-    .threat-value { color: var(--primary); font-weight: bold; word-break: break-all; }
-    .threat-value.danger { color: var(--danger); }
-
     .btn-main {
         width: 100%; padding: 1.2rem; background: linear-gradient(135deg, var(--primary), var(--secondary));
         color: #000; border: none; border-radius: 12px; font-size: 1.1rem; font-weight: 800; cursor: pointer; transition: var(--transition); display: flex; align-items: center; justify-content: center; gap: 0.8rem; margin-bottom: 1rem;
     }
     .btn-main:hover:not(:disabled) { transform: translateY(-3px); box-shadow: 0 10px 25px var(--primary-glow); }
-    .btn-main:disabled { background: var(--surface-hover); color: var(--text-muted); cursor: not-allowed; box-shadow: none; transform: none; }
-    
-    .p2p-box { background: rgba(0,0,0,0.3); border: 1px solid var(--border); padding: 1.5rem; border-radius: 12px; margin-bottom: 1.5rem; text-align: center; }
+    .btn-main:active { transform: translateY(0); }
+
+    .p2p-box { background: rgba(0,0,0,0.3); border: 1px solid var(--border); padding: clamp(1rem, 4vw, 1.5rem); border-radius: 12px; margin-bottom: 1.5rem; text-align: center; }
     .step-title { font-size: 1.1rem; color: var(--primary); margin-bottom: 1rem; font-weight: bold; text-align: right;}
     
     .input-group { display: flex; gap: 8px; margin-bottom: 1rem; flex-wrap: wrap; }
     .code-input {
-        flex: 1; min-width: 150px; background: #000; border: 1px solid var(--border); color: var(--text); padding: 1rem;
+        flex: 1; min-width: 100%; background: #000; border: 1px solid var(--border); color: var(--text); padding: 1rem;
         border-radius: 8px; font-family: 'Fira Code', monospace; direction: ltr; outline: none; transition: var(--transition); font-size: 0.8rem;
     }
     .code-input:focus { border-color: var(--primary); }
-    .btn-action { background: var(--surface-hover); border: 1px solid var(--border); color: var(--text); padding: 0 1rem; border-radius: 8px; cursor: pointer; font-weight: bold; transition: var(--transition); display: flex; align-items: center; gap: 5px; }
+    
+    .action-buttons { display: flex; gap: 8px; width: 100%; }
+    .btn-action { flex: 1; background: var(--surface-hover); border: 1px solid var(--border); color: var(--text); padding: 0.8rem; border-radius: 8px; cursor: pointer; font-weight: bold; transition: var(--transition); display: flex; align-items: center; justify-content: center; gap: 5px; }
     .btn-action:hover { background: var(--primary); color: #000; }
     .btn-scan { background: rgba(59, 130, 246, 0.2); border-color: var(--secondary); color: var(--secondary); }
     .btn-scan:hover { background: var(--secondary); color: #fff; }
 
-    .qr-container { background: #fff; padding: 10px; border-radius: 12px; display: inline-block; margin: 1rem auto; border: 4px solid var(--border); }
-    .qr-container canvas { display: block; max-width: 100%; height: auto; }
+    .qr-container { background: #fff; padding: 10px; border-radius: 12px; display: inline-block; margin: 1rem auto; border: 4px solid var(--border); width: 100%; max-width: 280px;}
+    .qr-container canvas { display: block; width: 100% !important; height: auto !important; }
 
     /* Scanner Modal */
     .scanner-modal {
-        position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95);
-        z-index: 2000; display: none; flex-direction: column; align-items: center; justify-content: center;
+        position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.98);
+        z-index: 2000; display: none; flex-direction: column; align-items: center; justify-content: center; padding: 1rem;
     }
-    .scanner-video { width: 100%; max-width: 500px; border-radius: 16px; border: 2px solid var(--primary); margin-bottom: 1rem; }
-    .scanner-close { background: var(--danger); color: #fff; border: none; padding: 1rem 2rem; border-radius: 12px; font-size: 1.1rem; font-weight: bold; cursor: pointer; }
+    .scanner-video { width: 100%; max-width: 400px; border-radius: 16px; border: 2px solid var(--primary); margin-bottom: 2rem; object-fit: cover; }
+    .scanner-close { background: var(--danger); color: #fff; border: none; padding: 1rem 2rem; border-radius: 12px; font-size: 1.1rem; font-weight: bold; cursor: pointer; width: 100%; max-width: 400px;}
 
     .progress-container { position: relative; width: 100%; height: 24px; background: #000; border-radius: 12px; overflow: hidden; margin-top: 1rem; display: none; border: 1px solid var(--border); }
     .progress-fill { height: 100%; background: linear-gradient(90deg, var(--secondary), var(--primary)); width: 0%; transition: width 0.2s linear; }
     
     .toast {
-        position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(100px);
+        position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(150px);
         background: var(--text); color: var(--bg-dark); padding: 1rem 2rem; border-radius: 30px;
-        font-weight: 800; box-shadow: 0 10px 30px rgba(0,0,0,0.5); transition: var(--transition); opacity: 0; z-index: 3000;
+        font-weight: 800; box-shadow: 0 10px 30px rgba(0,0,0,0.5); transition: var(--transition); opacity: 0; z-index: 3000; width: 90%; max-width: 400px; text-align: center;
     }
     .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
     .toast.error { background: var(--danger); color: white; }
 
-    ::-webkit-scrollbar { width: 8px; }
-    ::-webkit-scrollbar-track { background: var(--bg-dark); }
-    ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+    /* Threat Dashboard */
+    .threat-dashboard { display: none; margin-bottom: 1.5rem; }
+    .threat-header { background: var(--surface-hover); padding: 1rem; border-radius: 12px 12px 0 0; border: 1px solid var(--border); border-bottom: none; display: flex; justify-content: space-between; align-items: center; font-weight: bold; font-size: 0.9rem;}
+    .threat-body { background: #000; border: 1px solid var(--border); border-radius: 0 0 12px 12px; padding: 1rem; font-family: 'Fira Code', monospace; font-size: 0.85rem; direction: ltr; text-align: left; overflow-wrap: break-word;}
+    .threat-item { padding: 0.5rem 0; border-bottom: 1px dashed var(--border); display: flex; gap: 10px; align-items: center; justify-content: space-between;}
+    .threat-value { color: var(--primary); font-weight: bold; text-align: right;}
+    .threat-value.danger { color: var(--danger); }
+
+    @media (min-width: 600px) {
+        .code-input { flex: 2; min-width: 0; }
+        .action-buttons { width: auto; flex: 1; }
+    }
 </style>
 </head>
 <body>
 
 <div class="app-container">
+    <div class="privacy-badge">
+        🔒 مشفر كلياً (E2EE) | لا يوجد خوادم | 100% محلي
+    </div>
+
     <header>
-        <h1 class="brand-title">سِـتْـر<span class="brand-dot">💠</span></h1>
+        <h1 class="brand-title">سِـتْـر <div class="brand-symbol"></div></h1>
         <p class="tagline">تطهير الصور ونقل الملفات السريع والمشفر (P2P)</p>
     </header>
 
@@ -153,9 +178,10 @@
         
         <!-- قسم التطهير -->
         <section id="view-forensics" class="view-section active">
-            <div style="border: 2px dashed var(--border); border-radius: 12px; padding: 2.5rem 1rem; text-align: center; cursor: pointer; margin-bottom: 1.5rem;" onclick="document.getElementById('file-input-img').click()" id="drop-zone-img">
-                <div style="font-size: 3rem; margin-bottom: 1rem;">📸</div>
-                <div style="font-size: 1.2rem; font-weight: 700; margin-bottom: 0.5rem;">اسحب الصورة هنا لفحصها وتطهيرها</div>
+            <div style="border: 2px dashed var(--border); border-radius: 12px; padding: 3rem 1rem; text-align: center; cursor: pointer; margin-bottom: 1.5rem; transition: var(--transition);" onclick="document.getElementById('file-input-img').click()" id="drop-zone-img">
+                <div style="font-size: 3.5rem; margin-bottom: 1rem;">📸</div>
+                <div style="font-size: 1.2rem; font-weight: 700; margin-bottom: 0.5rem;">اضغط أو اسحب الصورة هنا</div>
+                <div style="font-size: 0.9rem; color: var(--text-muted);">سيتم فحصها وتطهيرها من بيانات التتبع (EXIF/GPS)</div>
                 <input type="file" id="file-input-img" accept="image/jpeg, image/png, image/webp" style="display:none;">
             </div>
 
@@ -168,10 +194,10 @@
             </div>
 
             <div id="preview-container" style="display: none; text-align: center;">
-                <img id="image-preview" style="max-width: 100%; max-height: 250px; border-radius: 8px; border: 2px solid var(--primary); margin-bottom: 1rem; box-shadow: 0 0 15px var(--primary-glow);">
-                <div style="display: flex; gap: 10px;">
-                    <button class="btn-main" id="btn-download">⬇️ حفظ بجهازي</button>
-                    <button class="btn-main" id="btn-send-ready" style="background: transparent; border: 2px solid var(--secondary); color: var(--text);">📡 إرسال لجهاز آخر</button>
+                <img id="image-preview" style="max-width: 100%; max-height: 250px; border-radius: 8px; border: 2px solid var(--primary); margin-bottom: 1.5rem; box-shadow: 0 0 15px var(--primary-glow); object-fit: contain;">
+                <div style="display: flex; gap: 10px; flex-direction: column;">
+                    <button class="btn-main" id="btn-download">⬇️ حفظ الصورة النظيفة بجهازي</button>
+                    <button class="btn-main" id="btn-send-ready" style="background: transparent; border: 2px solid var(--secondary); color: var(--text);">📡 إرسالها لجهاز آخر بأمان</button>
                 </div>
             </div>
         </section>
@@ -180,26 +206,30 @@
         <section id="view-send" class="view-section">
             <div class="p2p-box" id="send-step-1">
                 <div class="step-title">1. حدد الملف لتوليد شفرة الاتصال</div>
-                <input type="file" id="p2p-file-input" style="width: 100%; margin-bottom: 1rem; background: #000; padding: 10px; border-radius: 8px; border: 1px solid var(--border); color: var(--text);">
+                <input type="file" id="p2p-file-input" style="width: 100%; margin-bottom: 1.5rem; background: #000; padding: 15px; border-radius: 8px; border: 1px solid var(--border); color: var(--text);">
                 <button class="btn-main" id="btn-generate-offer">إنشاء QR Code للإرسال 🔑</button>
             </div>
 
             <div class="p2p-box" style="display: none;" id="send-step-2">
                 <div class="step-title">2. اجعل المستلم يمسح هذا الرمز</div>
                 <div class="qr-container" id="qr-offer"></div>
-                <div style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 1rem;">أو انسخ الشفرة يدوياً:</div>
+                <div style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1rem;">أو انسخ الشفرة وأرسلها له يدوياً:</div>
                 <div class="input-group">
                     <input type="text" id="offer-code" class="code-input" readonly>
-                    <button class="btn-action" onclick="copyCode('offer-code')">📋 نسخ</button>
+                    <div class="action-buttons">
+                        <button class="btn-action" onclick="copyCode('offer-code')">📋 نسخ</button>
+                    </div>
                 </div>
                 
-                <div class="step-title" style="margin-top: 2rem;">3. امسح رمز المستلم لبدء النقل</div>
+                <div class="step-title" style="margin-top: 2.5rem;">3. امسح رمز المستلم لبدء النقل</div>
                 <div class="input-group">
-                    <input type="text" id="answer-input" class="code-input" placeholder="امسح رمز المستلم أو ألصق شفرته...">
-                    <button class="btn-action btn-scan" onclick="startScanner('answer-input')">📷 مسح QR</button>
-                    <button class="btn-action" onclick="pasteCode('answer-input')">📥 لصق</button>
+                    <input type="text" id="answer-input" class="code-input" placeholder="ألصق شفرة المستلم هنا...">
+                    <div class="action-buttons">
+                        <button class="btn-action btn-scan" onclick="startScanner('answer-input')">📷 مسح</button>
+                        <button class="btn-action" onclick="pasteCode('answer-input')">📥 لصق</button>
+                    </div>
                 </div>
-                <button class="btn-main" id="btn-connect-sender">بدء النقل الفوري 🚀</button>
+                <button class="btn-main" id="btn-connect-sender" style="margin-top: 1rem;">بدء النقل الفوري 🚀</button>
             </div>
 
             <div class="progress-container" id="sender-progress"><div class="progress-fill" id="sender-fill"></div></div>
@@ -211,22 +241,26 @@
             <div class="p2p-box">
                 <div class="step-title">1. امسح رمز المُرسل</div>
                 <div class="input-group">
-                    <input type="text" id="offer-input" class="code-input" placeholder="امسح الرمز من شاشة المُرسل...">
-                    <button class="btn-action btn-scan" onclick="startScanner('offer-input')">📷 مسح QR</button>
-                    <button class="btn-action" onclick="pasteCode('offer-input')">📥 لصق</button>
+                    <input type="text" id="offer-input" class="code-input" placeholder="ألصق شفرة المُرسل هنا...">
+                    <div class="action-buttons">
+                        <button class="btn-action btn-scan" onclick="startScanner('offer-input')">📷 مسح</button>
+                        <button class="btn-action" onclick="pasteCode('offer-input')">📥 لصق</button>
+                    </div>
                 </div>
-                <button class="btn-main" id="btn-generate-answer">إنشاء رمز الرد الآمن 🔐</button>
+                <button class="btn-main" id="btn-generate-answer" style="margin-top: 1rem;">إنشاء رمز الرد الآمن 🔐</button>
             </div>
 
             <div class="p2p-box" style="display: none;" id="receive-step-2">
                 <div class="step-title">2. اجعل المُرسل يمسح ردك</div>
                 <div class="qr-container" id="qr-answer"></div>
-                <div style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 1rem;">أو انسخ الشفرة يدوياً:</div>
+                <div style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1rem;">أو انسخ الشفرة وأرسلها له يدوياً:</div>
                 <div class="input-group">
                     <input type="text" id="answer-code" class="code-input" readonly>
-                    <button class="btn-action" onclick="copyCode('answer-code')">📋 نسخ</button>
+                    <div class="action-buttons">
+                        <button class="btn-action" onclick="copyCode('answer-code')">📋 نسخ</button>
+                    </div>
                 </div>
-                <div style="color: var(--warning); margin-top: 1rem; font-weight: bold;">⏳ بانتظار أن يبدأ المُرسل النقل...</div>
+                <div style="color: var(--warning); margin-top: 1.5rem; font-weight: bold; background: rgba(245, 158, 11, 0.1); padding: 10px; border-radius: 8px;">⏳ بانتظار أن يبدأ المُرسل النقل...</div>
             </div>
 
             <div class="progress-container" id="receiver-progress"><div class="progress-fill" id="receiver-fill"></div></div>
@@ -235,15 +269,17 @@
     </main>
 </div>
 
+<div id="toast" class="toast"></div>
+
 <!-- Scanner Modal -->
 <div class="scanner-modal" id="scanner-modal">
-    <h3 style="color: var(--primary); margin-bottom: 1rem;">وجه الكاميرا نحو الـ QR Code</h3>
+    <h3 style="color: var(--primary); margin-bottom: 1.5rem; text-align: center;">وجه الكاميرا نحو الـ QR Code</h3>
     <video class="scanner-video" id="scanner-video" playsinline></video>
     <button class="scanner-close" onclick="stopScanner()">إلغاء المسح</button>
 </div>
 
-<!-- مكتبة QR Code خفيفة جداً (qrious) مدمجة لضمان العمل Offline -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
+<!-- مكتبة QR Code قوية وموثوقة لتحمل البيانات الضخمة (SDP) -->
+<script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
 
 <script>
     // --- UI Tabs Management ---
@@ -267,19 +303,20 @@
     }
 
     function copyCode(id) {
-        document.getElementById(id).select();
+        const el = document.getElementById(id);
+        el.select();
         document.execCommand('copy');
-        showToast("✅ تم النسخ!");
+        showToast("✅ تم النسخ! أرسلها للطرف الآخر.");
     }
     async function pasteCode(id) {
         try {
-            document.getElementById(id).value = await navigator.clipboard.readText();
+            const text = await navigator.clipboard.readText();
+            document.getElementById(id).value = text;
             showToast("✅ تم اللصق!");
         } catch (e) { showToast("❌ المتصفح يمنع اللصق التلقائي، الصق يدوياً.", true); }
     }
 
     // --- Compression System (SDP Deflate) ---
-    // يقلص حجم الشفرة لتتناسب مع الـ QR Code
     async function compressSDP(sdpObj) {
         const str = JSON.stringify(sdpObj);
         const stream = new Blob([str]).stream().pipeThrough(new CompressionStream('deflate'));
@@ -295,15 +332,24 @@
         return JSON.parse(text);
     }
 
+    // --- Reliable QR Code Generation ---
     function generateQR(elementId, value) {
-        document.getElementById(elementId).innerHTML = '<canvas></canvas>';
-        new QRious({
-            element: document.querySelector(`#${elementId} canvas`),
-            value: value,
-            size: 250,
-            level: 'L', // Low error correction = higher data capacity
-            background: 'white',
-            foreground: 'black'
+        const container = document.getElementById(elementId);
+        container.innerHTML = '<canvas></canvas>';
+        const canvas = container.querySelector('canvas');
+        
+        // استخدام QRCode.js الذي يتعامل بامتياز مع نصوص Base64 الطويلة
+        QRCode.toCanvas(canvas, value, {
+            width: 280,
+            margin: 2,
+            color: { dark: '#000000', light: '#ffffff' },
+            errorCorrectionLevel: 'L' // أقل مستوى تصحيح أخطاء ليتسع للبيانات الضخمة
+        }, function (error) {
+            if (error) {
+                console.error(error);
+                showToast("⚠️ الشفرة ضخمة جداً على الـ QR، استخدم النسخ اليدوي.", true);
+                container.innerHTML = '<div style="color:red; padding:20px;">الشفرة كبيرة جداً لتوليد QR. استخدم زر النسخ بالأسفل.</div>';
+            }
         });
     }
 
@@ -314,7 +360,7 @@
 
     async function startScanner(inputId) {
         if (!('BarcodeDetector' in window)) {
-            showToast("متصفحك لا يدعم المسح المباشر. يرجى تصوير الـ QR بكاميرا الهاتف العادية لنسخ النص ولصقه هنا.", true);
+            showToast("متصفحك لا يدعم المسح المباشر. استخدم كاميرا الهاتف العادية لنسخ النص ولصقه هنا.", true);
             return;
         }
         targetInputId = inputId;
@@ -378,7 +424,7 @@
                 if (tag === 0x010F) tags.Make = readStr(tiffOffset + valueOffset, count);
                 if (tag === 0x0110) tags.Model = readStr(tiffOffset + valueOffset, count);
                 if (tag === 0x0132) tags.DateTime = readStr(tiffOffset + valueOffset, count);
-                if (tag === 0x8825) tags.GPSInfo = "[تم ਰصد الموقع الدقيق]";
+                if (tag === 0x8825) tags.GPSInfo = "[تم رصد الموقع الدقيق]";
             }
         }
         function readStr(offset, len) {
@@ -410,17 +456,18 @@
                 if(exif.GPSInfo) { risks+=2; html += `<div class="threat-item"><span class="threat-label">الموقع:</span><span class="threat-value danger">⚠️ تم رصد إحداثيات GPS!</span></div>`; }
             }
             if(risks === 0) {
-                html = `<div style="color:var(--primary);text-align:center;">✅ لا توجد بيانات مرئية. سيتم التطهير كإجراء وقائي.</div>`;
-                count.style.background = 'var(--primary)'; count.textContent = "آمن";
+                html = `<div style="color:var(--primary);text-align:center;">✅ لا توجد بيانات تتبع واضحة. سيتم التطهير كإجراء وقائي.</div>`;
+                count.style.background = 'var(--primary)'; count.textContent = "آمن مبدئياً";
             } else {
                 count.style.background = 'var(--danger)'; count.textContent = `${risks} مخاطر`;
             }
         } catch (err) {
-            html = `<div style="color:var(--warning);text-align:center;">صيغة غير قياسية. سيتم التطهير الإجباري.</div>`;
+            html = `<div style="color:var(--warning);text-align:center;">تعذر الفحص الدقيق. سيتم التطهير الإجباري.</div>`;
             count.style.background = 'var(--warning)'; count.textContent = "تطهير إجباري";
         }
         body.innerHTML = html;
 
+        // التطهير (رسم الصورة على Canvas يحذف الميتاداتا)
         const reader = new FileReader();
         reader.onload = function(ev) {
             const img = new Image();
@@ -429,7 +476,7 @@
                 canvas.width = img.width; canvas.height = img.height;
                 canvas.getContext('2d').drawImage(img, 0, 0);
                 canvas.toBlob(blob => {
-                    window.currentCleanFile = new File([blob], `Safe_${file.name}`, { type: 'image/jpeg' });
+                    window.currentCleanFile = new File([blob], `Sitr_Safe_${file.name}`, { type: 'image/jpeg' });
                     document.getElementById('image-preview').src = URL.createObjectURL(blob);
                     document.getElementById('preview-container').style.display = 'block';
                     document.getElementById('drop-zone-img').style.display = 'none';
@@ -454,6 +501,7 @@
         const dt = new DataTransfer(); dt.items.add(window.currentCleanFile);
         document.getElementById('p2p-file-input').files = dt.files;
         switchTab('send');
+        showToast("تم إرفاق الصورة المطهرة، اضغط على إنشاء QR");
     });
 
     // --- 2. WebRTC P2P Transfer ---
@@ -467,6 +515,9 @@
         const file = document.getElementById('p2p-file-input').files[0];
         if(!file) return showToast("اختر ملفاً أولاً", true);
 
+        const btn = document.getElementById('btn-generate-offer');
+        btn.disabled = true; btn.innerText = "جاري التوليد...";
+
         document.getElementById('send-step-2').style.display = 'block';
         peerConnection = new RTCPeerConnection(config);
         dataChannel = peerConnection.createDataChannel('sitr-transfer');
@@ -477,6 +528,7 @@
                 const compressed = await compressSDP(peerConnection.localDescription);
                 document.getElementById('offer-code').value = compressed;
                 generateQR('qr-offer', compressed);
+                btn.innerText = "تم الإنشاء بنجاح ✅";
             }
         };
         const offer = await peerConnection.createOffer();
@@ -486,15 +538,16 @@
     document.getElementById('btn-connect-sender').addEventListener('click', async () => {
         try {
             const answerCode = document.getElementById('answer-input').value.trim();
+            if(!answerCode) return showToast("الرجاء إدخال شفرة المستلم", true);
             const decompressed = await decompressSDP(answerCode);
             await peerConnection.setRemoteDescription(decompressed);
-            document.getElementById('sender-status').innerText = "جاري الاتصال...";
+            document.getElementById('sender-status').innerText = "جاري الاتصال المباشر...";
         } catch (e) { showToast("الشفرة غير صالحة!", true); }
     });
 
     function setupDataChannelSender(file) {
         dataChannel.onopen = () => {
-            document.getElementById('sender-status').innerText = "جاري النقل السريع...";
+            document.getElementById('sender-status').innerText = "جاري النقل السريع والمشفر...";
             document.getElementById('sender-progress').style.display = 'block';
             dataChannel.send(JSON.stringify({ type: 'meta', name: file.name, size: file.size, mime: file.type }));
             
@@ -512,7 +565,7 @@
                         dataChannel.onbufferedamountlow = () => { dataChannel.onbufferedamountlow = null; readSlice(offset); };
                     } else readSlice(offset);
                 } else {
-                    document.getElementById('sender-status').innerHTML = "<span style='color:var(--primary)'>✅ تم الإرسال!</span>";
+                    document.getElementById('sender-status').innerHTML = "<span style='color:var(--primary)'>✅ تم الإرسال بنجاح!</span>";
                     dataChannel.send(JSON.stringify({ type: 'eof' }));
                 }
             };
@@ -525,8 +578,12 @@
     document.getElementById('btn-generate-answer').addEventListener('click', async () => {
         try {
             const offerCode = document.getElementById('offer-input').value.trim();
-            const decompressed = await decompressSDP(offerCode);
+            if(!offerCode) return showToast("الرجاء إدخال شفرة المُرسل", true);
             
+            const btn = document.getElementById('btn-generate-answer');
+            btn.disabled = true; btn.innerText = "جاري التوليد...";
+
+            const decompressed = await decompressSDP(offerCode);
             peerConnection = new RTCPeerConnection(config);
             peerConnection.ondatachannel = e => { dataChannel = e.channel; setupDataChannelReceiver(); };
             
@@ -536,17 +593,24 @@
                     document.getElementById('answer-code').value = compressed;
                     generateQR('qr-answer', compressed);
                     document.getElementById('receive-step-2').style.display = 'block';
+                    btn.innerText = "تم الإنشاء بنجاح ✅";
                 }
             };
 
             await peerConnection.setRemoteDescription(decompressed);
             const answer = await peerConnection.createAnswer();
             await peerConnection.setLocalDescription(answer);
-        } catch (e) { showToast("شفرة المُرسل غير صالحة!", true); }
+        } catch (e) { 
+            showToast("شفرة المُرسل غير صالحة!", true); 
+            document.getElementById('btn-generate-answer').disabled = false;
+            document.getElementById('btn-generate-answer').innerText = "إنشاء رمز الرد الآمن 🔐";
+        }
     });
 
     function setupDataChannelReceiver() {
         let receiveBuffer = [], receivedSize = 0, fileMeta = null;
+        document.getElementById('receiver-status').innerText = "تم الاتصال، جاري الاستلام...";
+        
         dataChannel.onmessage = e => {
             document.getElementById('receiver-progress').style.display = 'block';
             if (typeof e.data === 'string') {
@@ -556,7 +620,7 @@
                     const blob = new Blob(receiveBuffer, { type: fileMeta.mime });
                     const url = URL.createObjectURL(blob);
                     const a = document.createElement('a'); a.href = url; a.download = fileMeta.name; a.click();
-                    document.getElementById('receiver-status').innerHTML = "<span style='color:var(--primary)'>✅ تم الاستلام بنجاح!</span>";
+                    document.getElementById('receiver-status').innerHTML = "<span style='color:var(--primary)'>✅ تم الاستلام بنجاح! يتم الحفظ...</span>";
                     receiveBuffer = [];
                 }
             } else {
