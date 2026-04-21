@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="سِتْر - أداة لتطهير الصور من البيانات الوصفية (EXIF) والمواقع الجغرافية المخفية لحماية خصوصيتك.">
+    
+    <!-- سياسة أمان صارمة: لا اتصال بالإنترنت، مع السماح بعرض الصور محلياً عبر blob و data -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src 'none';">
+    <meta name="referrer" content="no-referrer">
+
+    <title>سِتْر | حماية خصوصية الصور</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;800;900&display=swap" rel="stylesheet">
+
+<style>
+    :root {
+        --bg-dark: #0f0c29;
+        --surface: #1a1638;
+        --surface-hover: #26214d;
+        --border: #352d6b;
+        --text: #f8fafc;
+        --text-muted: #a5b4fc;
+        --primary: #6366f1;
+        --primary-glow: rgba(99, 102, 241, 0.3);
+        --secondary: #06b6d4;
+        --danger: #f43f5e;
+        --success: #10b981;
+        --radius: 16px;
+        --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Cairo', sans-serif; }
+
+    body {
+        background: linear-gradient(135deg, #0f0c29, #302b63, #0f0c29);
+        color: var(--text);
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 2rem 1rem;
+        background-attachment: fixed;
+    }
+
+    .app-container { width: 100%; max-width: 650px; position: relative; }
+
+    header { text-align: center; margin-bottom: 2rem; }
+
+    .brand-title {
+        font-weight: 900; font-size: 3.8rem; letter-spacing: -1px;
+        background: linear-gradient(135deg, #ffffff, var(--secondary));
+        -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        margin-bottom: 0.2rem; display: flex; align-items: center; justify-content: center; gap: 10px;
+    }
+
+    .brand-dot { color: var(--primary); -webkit-text-fill-color: var(--primary); animation: float 3s ease-in-out infinite; display: inline-block;}
+
+    @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); filter: drop-shadow(0 5px 15px var(--primary)); } }
+
+    .tagline { color: var(--text-muted); font-size: 1.1rem; font-weight: 600; }
+
+    .main-nav {
+        display: flex; background: var(--surface); border: 1px solid var(--border);
+        border-radius: var(--radius); padding: 0.5rem; margin-bottom: 1.5rem; gap: 0.5rem;
+    }
+
+    .nav-btn {
+        flex: 1; background: transparent; border: none; color: var(--text-muted);
+        font-size: 1rem; font-weight: 700; padding: 0.8rem; border-radius: 12px;
+        cursor: pointer; transition: var(--transition);
+    }
+
+    .nav-btn.active { background: var(--primary); color: #fff; box-shadow: 0 4px 15px var(--primary-glow); }
+
+    .card {
+        background: rgba(26, 22, 56, 0.7); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+        border: 1px solid var(--border); border-radius: var(--radius); padding: 2rem;
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5); position: relative; overflow: hidden;
+    }
+
+    .view-section { display: none; animation: fadeIn 0.4s ease; }
+    .view-section.active { display: block; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+    .file-drop-zone {
+        border: 2px dashed var(--border); border-radius: 12px; padding: 2.5rem 1rem;
+        text-align: center; cursor: pointer; transition: var(--transition);
+        background: rgba(255,255,255,0.01); margin-bottom: 1.5rem; position: relative;
+        overflow: hidden;
+    }
+    .file-drop-zone:hover, .file-drop-zone.dragover { border-color: var(--secondary); background: rgba(6, 182, 212, 0.05); }
+    .file-drop-zone input[type="file"] { display: none; }
+    
+    .file-icon { font-size: 3.5rem; margin-bottom: 1rem; transition: var(--transition); }
+    .file-drop-zone:hover .file-icon { transform: scale(1.1); }
+    .file-instruction { font-size: 1.2rem; font-weight: 700; margin-bottom: 0.5rem; color: #fff; }
+    .file-subtext { font-size: 0.9rem; color: var(--text-muted); }
+
+    .preview-container { display: none; margin-top: 1.5rem; text-align: center; }
+    .image-preview { max-width: 100%; max-height: 250px; border-radius: 8px; border: 2px solid var(--border); margin-bottom: 1rem; object-fit: contain; background: #000; }
+    
+    .stats-box {
+        display: flex; justify-content: space-around; background: var(--surface-hover);
+        padding: 1rem; border-radius: 12px; border: 1px solid var(--border); margin-bottom: 1.5rem;
+    }
+    .stat-item { text-align: center; }
+    .stat-label { font-size: 0.8rem; color: var(--text-muted); margin-bottom: 0.3rem; }
+    .stat-value { font-size: 1.1rem; font-weight: 800; color: #fff; direction: ltr;}
+    .stat-value.deleted { color: var(--success); }
+
+    .btn-main {
+        width: 100%; padding: 1.2rem; background: linear-gradient(135deg, var(--primary), var(--secondary));
+        color: #fff; border: none; border-radius: 12px; font-size: 1.2rem; font-weight: 800;
+        cursor: pointer; transition: var(--transition); display: flex; align-items: center; justify-content: center; gap: 0.8rem;
+    }
+    .btn-main:hover:not(:disabled) { transform: translateY(-3px); box-shadow: 0 10px 25px var(--primary-glow); }
+    .btn-main:disabled { background: var(--surface-hover); color: var(--text-muted); cursor: not-allowed; box-shadow: none; transform: none; }
+
+    .alert-box {
+        background: rgba(6, 182, 212, 0.1); border: 1px solid var(--secondary); color: var(--text);
+        padding: 1rem; border-radius: 10px; margin-bottom: 1.5rem; font-size: 0.9rem; display: flex; align-items: center; gap: 15px; line-height: 1.6;
+    }
+    .alert-box svg { flex-shrink: 0; }
+
+    .transparency-footer { margin-top: 2rem; text-align: center; font-size: 0.85rem; color: var(--text-muted); line-height: 1.6; }
+    .transparency-footer span { color: var(--secondary); font-weight: 700; }
+
+    .toast {
+        position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(100px);
+        background: var(--text); color: var(--bg-dark); padding: 1rem 2rem; border-radius: 30px;
+        font-weight: 800; box-shadow: 0 10px 30px rgba(0,0,0,0.5); transition: var(--transition); opacity: 0; z-index: 1000;
+    }
+    .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+    .toast.error { background: var(--danger); color: white; }
+
+    .loader { display: none; border: 3px solid rgba(255,255,255,0.2); border-top-color: #fff; border-radius: 50%; width: 24px; height: 24px; animation: spin 1s linear infinite; }
+    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+    .info-list { margin-top: 1rem; padding-right: 1.5rem; line-height: 1.8; color: var(--text-muted); }
+    .info-list li { margin-bottom: 0.8rem; }
+    .info-list strong { color: var(--secondary); }
+
+    canvas { display: none; } /* مخفي، يستخدم فقط للمعالجة */
+
+    @media (max-width: 600px) { .brand-title { font-size: 3rem; } }
+</style>
+</head>
+<body>
+
+<div class="app-container">
+    <header>
+        <h1 class="brand-title">سِـتْـر<span class="brand-dot">👁️‍🗨️</span></h1>
+        <p class="tagline">تطهير الصور من بيانات التتبع والمواقع الجغرافية</p>
+    </header>
+
+    <nav class="main-nav">
+        <button class="nav-btn active" data-view="cleanse">🛡️ تطهير صورة</button>
+        <button class="nav-btn" data-view="about">💡 كيف يعمل؟</button>
+    </nav>
+
+    <main class="card">
+        <!-- قسم التطهير -->
+        <section id="view-cleanse" class="view-section active">
+            <div class="alert-box">
+                <svg width="24" height="24" fill="none" stroke="var(--secondary)" stroke-width="2" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                <div>الصور التي تلتقطها بهاتفك تحتوي غالباً على <strong>موقعك الجغرافي الدقيق</strong> ونوع هاتفك. استخدم هذه الأداة لمسحها تماماً قبل مشاركتها.</div>
+            </div>
+
+            <div class="file-drop-zone" id="drop-zone">
+                <div class="file-icon">📸</div>
+                <div class="file-instruction">اسحب وأفلت الصورة هنا</div>
+                <div class="file-subtext">يدعم (JPG, PNG, WEBP) حتى 20MB</div>
+                <input type="file" id="file-input" accept="image/jpeg, image/png, image/webp">
+            </div>
+
+            <div class="preview-container" id="preview-container">
+                <img id="image-preview" class="image-preview" alt="معاينة الصورة">
+                
+                <div class="stats-box">
+                    <div class="stat-item">
+                        <div class="stat-label">الحجم الأصلي</div>
+                        <div class="stat-value" id="stat-original">0 KB</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-label">بعد التطهير</div>
+                        <div class="stat-value deleted" id="stat-clean">0 KB</div>
+                    </div>
+                </div>
+
+                <button class="btn-main" id="btn-download">
+                    <span class="btn-text">⬇️ تحميل الصورة الآمنة</span>
+                    <div class="loader"></div>
+                </button>
+            </div>
+        </section>
+
+        <!-- قسم المعلومات -->
+        <section id="view-about" class="view-section">
+            <h2 style="margin-bottom: 1rem; color: var(--text);">ما هي البيانات الوصفية (EXIF)؟</h2>
+            <p style="color: var(--text-muted); line-height: 1.6; margin-bottom: 1.5rem;">
+                عندما تلتقط صورة، تقوم الكاميرا بتخزين بيانات خفية داخل ملف الصورة. هذه البيانات قد تشمل إحداثيات الـ GPS لموقعك، تاريخ ووقت التقاط الصورة، ونوع الجهاز المستخدم. مشاركة هذه الصور على الإنترنت قد يعرض <strong>خصوصيتك وموقع منزلك</strong> للخطر.
+            </p>
+            
+            <div style="background: rgba(0,0,0,0.3); padding: 1.5rem; border-radius: 12px; border: 1px solid var(--border);">
+                <h3 style="color: var(--secondary); margin-bottom: 1rem; font-size: 1.1rem;">لماذا "سِتْر" آمن تماماً؟</h3>
+                <ul class="info-list">
+                    <li><strong>بدون إنترنت (Offline):</strong> لا يتم رفع صورك إلى أي سيرفر أو سحابة. كل المعالجة تتم داخل متصفحك (في جهازك شخصياً).</li>
+                    <li><strong>تجريد هندسي:</strong> نقوم باستخراج "البيكسلات" (الألوان) فقط من صورتك، وإعادة رسمها في ملف جديد بالكامل، مما يضمن تدمير أي بيانات مخفية أو أكواد خبيثة مضمنة.</li>
+                    <li><strong>الجودة العالية:</strong> نحافظ على أبعاد صورتك الأصلية، ونستخدم أعلى جودة تصدير ممكنة للحفاظ على وضوح الصورة.</li>
+                </ul>
+            </div>
+        </section>
+    </main>
+
+    <div class="transparency-footer">
+        يعمل بتقنية <span>HTML5 Canvas API</span> لمعالجة الصور محلياً.<br>
+        صُنع لحماية الخصوصية الرقمية للمستخدم العربي. 🛡️
+    </div>
+</div>
+
+<canvas id="processing-canvas"></canvas>
+<div class="toast" id="toast">تمت العملية!</div>
+
+<script>
+    // --- إعدادات التطبيق ---
+    const MAX_FILE_SIZE = 20 * 1024 * 1024; // 20 ميجابايت الحد الأقصى
+    let currentCleanBlob = null;
+    let originalFileName = "";
+
+    // --- إدارة التبويبات ---
+    const navBtns = document.querySelectorAll('.nav-btn');
+    const views = document.querySelectorAll('.view-section');
+    
+    navBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            navBtns.forEach(b => b.classList.remove('active'));
+            views.forEach(v => v.classList.remove('active'));
+            btn.classList.add('active');
+            document.getElementById(`view-${btn.dataset.view}`).classList.add('active');
+        });
+    });
+
+    // --- الإشعارات ---
+    let toastTimeout;
+    function showToast(msg, isError = false) {
+        const toast = document.getElementById('toast');
+        toast.textContent = msg;
+        if(isError) toast.classList.add('error'); else toast.classList.remove('error');
+        toast.classList.add('show');
+        
+        clearTimeout(toastTimeout);
+        toastTimeout = setTimeout(() => toast.classList.remove('show'), 4000);
+    }
+
+    function formatBytes(bytes) {
+        if(bytes === 0) return '0 B';
+        const k = 1024, sizes = ['B', 'KB', 'MB'];
+        const i = Math.floor(Math.log(bytes) / Math.log(k));
+        return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+    }
+
+    // --- إدارة السحب والإفلات ---
+    const dropZone = document.getElementById('drop-zone');
+    const fileInput = document.getElementById('file-input');
+    const previewContainer = document.getElementById('preview-container');
+    const imagePreview = document.getElementById('image-preview');
+    const statOriginal = document.getElementById('stat-original');
+    const statClean = document.getElementById('stat-clean');
+
+    dropZone.addEventListener('click', () => fileInput.click());
+    
+    dropZone.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        dropZone.classList.add('dragover');
+    });
+    
+    dropZone.addEventListener('dragleave', (e) => {
+        e.preventDefault();
+        dropZone.classList.remove('dragover');
+    });
+    
+    dropZone.addEventListener('drop', (e) => {
+        e.preventDefault();
+        dropZone.classList.remove('dragover');
+        if(e.dataTransfer.files.length) {
+            fileInput.files = e.dataTransfer.files;
+            processImage();
+        }
+    });
+
+    fileInput.addEventListener('change', processImage);
+
+    // --- اللب البرمجي: معالجة الصورة وتطهيرها ---
+    function processImage() {
+        if(fileInput.files.length === 0) return;
+        
+        const file = fileInput.files[0];
+        
+        // التحقق من نوع الملف
+        if (!file.type.match(/image\/(jpeg|png|webp)/)) {
+            showToast("عذراً، الأداة تدعم صور JPG, PNG, WEBP فقط.", true);
+            fileInput.value = "";
+            return;
+        }
+
+        // التحقق من الحجم
+        if (file.size > MAX_FILE_SIZE) {
+            showToast(`الصورة كبيرة جداً! الحد الأقصى هو ${formatBytes(MAX_FILE_SIZE)}.`, true);
+            fileInput.value = "";
+            return;
+        }
+
+        originalFileName = file.name;
+        const originalSize = file.size;
+        statOriginal.textContent = formatBytes(originalSize);
+        statClean.textContent = "جاري التطهير...";
+        
+        // إظهار منطقة المعاينة وإخفاء منطقة الإسقاط
+        dropZone.style.display = 'none';
+        previewContainer.style.display = 'block';
+
+        const reader = new FileReader();
+        reader.onload = function(event) {
+            const img = new Image();
+            img.onload = function() {
+                // استخدام الـ Canvas لإعادة رسم الصورة (هذا يدمر أي بيانات EXIF)
+                const canvas = document.getElementById('processing-canvas');
+                const ctx = canvas.getContext('2d');
+                
+                // الحفاظ على الأبعاد الأصلية
+                canvas.width = img.width;
+                canvas.height = img.height;
+                
+                // رسم الصورة البيكسل بالبيكسل
+                ctx.drawImage(img, 0, 0);
+                
+                // تحديد نوع التصدير بناءً على الأصل (PNG يحافظ على الشفافية، الباقي JPG لتقليل الحجم)
+                let exportMimeType = 'image/jpeg';
+                let quality = 0.95; // جودة عالية جداً
+                
+                if (file.type === 'image/png') {
+                    exportMimeType = 'image/png';
+                    quality = undefined; // PNG لا يستخدم بارامتر الجودة
+                } else if (file.type === 'image/webp') {
+                    exportMimeType = 'image/webp';
+                }
+
+                // تحويل الرسمة إلى ملف جديد نظيف
+                canvas.toBlob(function(blob) {
+                    currentCleanBlob = blob;
+                    
+                    // تحديث الإحصائيات
+                    statClean.textContent = formatBytes(blob.size);
+                    
+                    // عرض الصورة المنظفة
+                    const cleanUrl = URL.createObjectURL(blob);
+                    imagePreview.src = cleanUrl;
+                    
+                    showToast("✨ تم تطهير الصورة بنجاح وتجريدها من البيانات السرية!");
+                    
+                    // تحرير الذاكرة
+                    URL.revokeObjectURL(event.target.result);
+                }, exportMimeType, quality);
+            };
+            img.src = event.target.result;
+        };
+        reader.readAsDataURL(file);
+    }
+
+    // --- تحميل الصورة المنظفة ---
+    const btnDownload = document.getElementById('btn-download');
+    btnDownload.addEventListener('click', () => {
+        if (!currentCleanBlob) return;
+
+        // تجهيز اسم ملف آمن
+        const safeName = originalFileName.replace(/\.[^/.]+$/, ""); // إزالة الامتداد القديم
+        const extension = currentCleanBlob.type.split('/')[1] === 'jpeg' ? 'jpg' : currentCleanBlob.type.split('/')[1];
+        const finalName = `Sitr_Clean_${safeName}.${extension}`;
+
+        const url = URL.createObjectURL(currentCleanBlob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = finalName;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        
+        setTimeout(() => URL.revokeObjectURL(url), 1000);
+        showToast("✅ تم تحميل الصورة الآمنة!");
+        
+        // إعادة تهيئة الأداة لصورة جديدة بعد 3 ثواني
+        setTimeout(() => {
+            dropZone.style.display = 'block';
+            previewContainer.style.display = 'none';
+            fileInput.value = "";
+            currentCleanBlob = null;
+        }, 3000);
+    });
+
+</script>
+</body>
+</html>
