@@ -3,82 +3,69 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="سِتْر - أداة لتطهير الصور من البيانات الوصفية (EXIF) والمواقع الجغرافية المخفية لحماية خصوصيتك.">
+    <meta name="description" content="سِتْر - استخراج وتطهير البيانات الوصفية (EXIF) ونقل الملفات بأمان تام P2P.">
     
-    <!-- سياسة أمان صارمة: لا اتصال بالإنترنت، مع السماح بعرض الصور محلياً عبر blob و data -->
-    <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src 'none';">
+    <!-- سياسة أمان صارمة: السماح بـ WebRTC (STUN) للاتصال المباشر P2P فقط بدون خوادم بيانات -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src 'self' stun.l.google.com:19302; base-uri 'none'; form-action 'none';">
     <meta name="referrer" content="no-referrer">
 
-    <title>سِتْر | حماية خصوصية الصور</title>
+    <title>سِتْر | خصوصية ونقل آمن</title>
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;800;900&family=Fira+Code:wght@400;600&display=swap" rel="stylesheet">
 
 <style>
     :root {
-        --bg-dark: #0f0c29;
-        --surface: #1a1638;
-        --surface-hover: #26214d;
-        --border: #352d6b;
-        --text: #f8fafc;
-        --text-muted: #a5b4fc;
-        --primary: #6366f1;
-        --primary-glow: rgba(99, 102, 241, 0.3);
-        --secondary: #06b6d4;
-        --danger: #f43f5e;
+        --bg-dark: #070a13;
+        --surface: #111827;
+        --surface-hover: #1f2937;
+        --border: #374151;
+        --text: #f3f4f6;
+        --text-muted: #9ca3af;
+        --primary: #8b5cf6;
+        --primary-glow: rgba(139, 92, 246, 0.4);
+        --secondary: #0ea5e9;
+        --danger: #ef4444;
         --success: #10b981;
+        --warning: #f59e0b;
         --radius: 16px;
-        --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        --transition: all 0.3s ease;
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Cairo', sans-serif; }
 
     body {
-        background: linear-gradient(135deg, #0f0c29, #302b63, #0f0c29);
+        background-color: var(--bg-dark);
+        background-image: radial-gradient(circle at 50% 0%, rgba(139, 92, 246, 0.1) 0%, transparent 50%);
         color: var(--text);
         min-height: 100vh;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        padding: 2rem 1rem;
-        background-attachment: fixed;
+        display: flex; flex-direction: column; align-items: center; padding: 2rem 1rem;
     }
 
-    .app-container { width: 100%; max-width: 650px; position: relative; }
+    .app-container { width: 100%; max-width: 700px; position: relative; }
 
     header { text-align: center; margin-bottom: 2rem; }
-
     .brand-title {
-        font-weight: 900; font-size: 3.8rem; letter-spacing: -1px;
-        background: linear-gradient(135deg, #ffffff, var(--secondary));
-        -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-        margin-bottom: 0.2rem; display: flex; align-items: center; justify-content: center; gap: 10px;
+        font-weight: 900; font-size: 3.5rem; letter-spacing: -1px;
+        background: linear-gradient(135deg, #fff, var(--primary), var(--secondary));
+        -webkit-background-clip: text; -webkit-text-fill-color: transparent; display: flex; align-items: center; justify-content: center; gap: 10px;
     }
-
-    .brand-dot { color: var(--primary); -webkit-text-fill-color: var(--primary); animation: float 3s ease-in-out infinite; display: inline-block;}
-
-    @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); filter: drop-shadow(0 5px 15px var(--primary)); } }
-
     .tagline { color: var(--text-muted); font-size: 1.1rem; font-weight: 600; }
 
     .main-nav {
         display: flex; background: var(--surface); border: 1px solid var(--border);
-        border-radius: var(--radius); padding: 0.5rem; margin-bottom: 1.5rem; gap: 0.5rem;
+        border-radius: var(--radius); padding: 0.5rem; margin-bottom: 1.5rem; gap: 0.5rem; flex-wrap: wrap;
     }
-
     .nav-btn {
-        flex: 1; background: transparent; border: none; color: var(--text-muted);
-        font-size: 1rem; font-weight: 700; padding: 0.8rem; border-radius: 12px;
-        cursor: pointer; transition: var(--transition);
+        flex: 1; min-width: 120px; background: transparent; border: none; color: var(--text-muted);
+        font-size: 1rem; font-weight: 700; padding: 0.8rem; border-radius: 12px; cursor: pointer; transition: var(--transition);
     }
-
-    .nav-btn.active { background: var(--primary); color: #fff; box-shadow: 0 4px 15px var(--primary-glow); }
+    .nav-btn.active { background: var(--surface-hover); color: var(--text); box-shadow: inset 0 2px 0 var(--primary); }
 
     .card {
-        background: rgba(26, 22, 56, 0.7); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
-        border: 1px solid var(--border); border-radius: var(--radius); padding: 2rem;
-        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5); position: relative; overflow: hidden;
+        background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+        padding: 2rem; box-shadow: 0 20px 40px rgba(0,0,0,0.5); position: relative; overflow: hidden;
     }
 
     .view-section { display: none; animation: fadeIn 0.4s ease; }
@@ -87,46 +74,49 @@
 
     .file-drop-zone {
         border: 2px dashed var(--border); border-radius: 12px; padding: 2.5rem 1rem;
-        text-align: center; cursor: pointer; transition: var(--transition);
-        background: rgba(255,255,255,0.01); margin-bottom: 1.5rem; position: relative;
-        overflow: hidden;
+        text-align: center; cursor: pointer; transition: var(--transition); background: rgba(0,0,0,0.2); margin-bottom: 1.5rem;
     }
-    .file-drop-zone:hover, .file-drop-zone.dragover { border-color: var(--secondary); background: rgba(6, 182, 212, 0.05); }
+    .file-drop-zone:hover { border-color: var(--primary); background: rgba(139,92,246,0.05); }
     .file-drop-zone input[type="file"] { display: none; }
-    
-    .file-icon { font-size: 3.5rem; margin-bottom: 1rem; transition: var(--transition); }
-    .file-drop-zone:hover .file-icon { transform: scale(1.1); }
-    .file-instruction { font-size: 1.2rem; font-weight: 700; margin-bottom: 0.5rem; color: #fff; }
-    .file-subtext { font-size: 0.9rem; color: var(--text-muted); }
+    .file-icon { font-size: 3rem; margin-bottom: 1rem; }
+    .file-instruction { font-size: 1.2rem; font-weight: 700; color: #fff; }
 
-    .preview-container { display: none; margin-top: 1.5rem; text-align: center; }
-    .image-preview { max-width: 100%; max-height: 250px; border-radius: 8px; border: 2px solid var(--border); margin-bottom: 1rem; object-fit: contain; background: #000; }
-    
-    .stats-box {
-        display: flex; justify-content: space-around; background: var(--surface-hover);
-        padding: 1rem; border-radius: 12px; border: 1px solid var(--border); margin-bottom: 1.5rem;
+    /* Exif Terminal */
+    .exif-terminal {
+        background: #000; border: 1px solid var(--border); border-radius: 8px; padding: 1rem; margin-bottom: 1.5rem;
+        font-family: 'Fira Code', monospace; font-size: 0.85rem; color: #10b981; direction: ltr; text-align: left;
+        max-height: 250px; overflow-y: auto; display: none; white-space: pre-wrap; word-break: break-all;
     }
-    .stat-item { text-align: center; }
-    .stat-label { font-size: 0.8rem; color: var(--text-muted); margin-bottom: 0.3rem; }
-    .stat-value { font-size: 1.1rem; font-weight: 800; color: #fff; direction: ltr;}
-    .stat-value.deleted { color: var(--success); }
+    .exif-terminal .danger { color: var(--danger); font-weight: bold; }
+    .exif-terminal .key { color: var(--secondary); }
 
+    .preview-container { display: none; text-align: center; }
+    .image-preview { max-width: 100%; max-height: 250px; border-radius: 8px; border: 2px solid var(--border); margin-bottom: 1rem; }
+    
     .btn-main {
-        width: 100%; padding: 1.2rem; background: linear-gradient(135deg, var(--primary), var(--secondary));
-        color: #fff; border: none; border-radius: 12px; font-size: 1.2rem; font-weight: 800;
-        cursor: pointer; transition: var(--transition); display: flex; align-items: center; justify-content: center; gap: 0.8rem;
+        width: 100%; padding: 1.2rem; background: linear-gradient(135deg, var(--primary), #6d28d9);
+        color: #fff; border: none; border-radius: 12px; font-size: 1.1rem; font-weight: 800;
+        cursor: pointer; transition: var(--transition); display: flex; align-items: center; justify-content: center; gap: 0.8rem; margin-bottom: 1rem;
     }
-    .btn-main:hover:not(:disabled) { transform: translateY(-3px); box-shadow: 0 10px 25px var(--primary-glow); }
-    .btn-main:disabled { background: var(--surface-hover); color: var(--text-muted); cursor: not-allowed; box-shadow: none; transform: none; }
+    .btn-main:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 10px 20px var(--primary-glow); }
+    .btn-main:disabled { background: var(--surface-hover); color: var(--text-muted); cursor: not-allowed; transform: none; box-shadow: none;}
+    .btn-secondary { background: var(--surface-hover); border: 1px solid var(--border); color: var(--text); }
+    .btn-secondary:hover:not(:disabled) { background: var(--border); box-shadow: none;}
 
-    .alert-box {
-        background: rgba(6, 182, 212, 0.1); border: 1px solid var(--secondary); color: var(--text);
-        padding: 1rem; border-radius: 10px; margin-bottom: 1.5rem; font-size: 0.9rem; display: flex; align-items: center; gap: 15px; line-height: 1.6;
+    /* WebRTC UI */
+    .p2p-box { background: rgba(0,0,0,0.3); border: 1px solid var(--border); padding: 1.5rem; border-radius: 12px; margin-bottom: 1.5rem; }
+    .code-display {
+        background: #000; color: var(--secondary); padding: 1rem; border-radius: 8px; font-family: 'Fira Code', monospace;
+        text-align: center; word-break: break-all; font-size: 0.9rem; margin: 1rem 0; border: 1px dashed var(--border); user-select: all; cursor: pointer;
     }
-    .alert-box svg { flex-shrink: 0; }
-
-    .transparency-footer { margin-top: 2rem; text-align: center; font-size: 0.85rem; color: var(--text-muted); line-height: 1.6; }
-    .transparency-footer span { color: var(--secondary); font-weight: 700; }
+    .code-input {
+        width: 100%; background: #000; border: 1px solid var(--border); color: var(--text); padding: 1rem;
+        border-radius: 8px; font-family: 'Fira Code', monospace; direction: ltr; margin-bottom: 1rem; outline: none;
+    }
+    .code-input:focus { border-color: var(--primary); }
+    .progress-bar { width: 100%; height: 8px; background: var(--border); border-radius: 4px; overflow: hidden; margin-top: 1rem; display: none; }
+    .progress-fill { height: 100%; background: var(--success); width: 0%; transition: width 0.3s; }
+    .status-text { font-size: 0.9rem; color: var(--text-muted); margin-top: 0.5rem; text-align: center; }
 
     .toast {
         position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(100px);
@@ -136,270 +126,409 @@
     .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
     .toast.error { background: var(--danger); color: white; }
 
-    .loader { display: none; border: 3px solid rgba(255,255,255,0.2); border-top-color: #fff; border-radius: 50%; width: 24px; height: 24px; animation: spin 1s linear infinite; }
-    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    canvas { display: none; }
 
-    .info-list { margin-top: 1rem; padding-right: 1.5rem; line-height: 1.8; color: var(--text-muted); }
-    .info-list li { margin-bottom: 0.8rem; }
-    .info-list strong { color: var(--secondary); }
-
-    canvas { display: none; } /* مخفي، يستخدم فقط للمعالجة */
-
-    @media (max-width: 600px) { .brand-title { font-size: 3rem; } }
+    /* Scrollbar */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: var(--bg-dark); }
+    ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
 </style>
 </head>
 <body>
 
 <div class="app-container">
     <header>
-        <h1 class="brand-title">سِـتْـر<span class="brand-dot">👁️‍🗨️</span></h1>
-        <p class="tagline">تطهير الصور من بيانات التتبع والمواقع الجغرافية</p>
+        <h1 class="brand-title">سِـتْـر</h1>
+        <p class="tagline">تطهير الصور ونقل الملفات المشفر P2P</p>
     </header>
 
     <nav class="main-nav">
-        <button class="nav-btn active" data-view="cleanse">🛡️ تطهير صورة</button>
-        <button class="nav-btn" data-view="about">💡 كيف يعمل؟</button>
+        <button class="nav-btn active" data-view="forensics">🛡️ تطهير وفحص</button>
+        <button class="nav-btn" data-view="send">📡 إرسال آمن</button>
+        <button class="nav-btn" data-view="receive">📥 استقبال</button>
     </nav>
 
     <main class="card">
-        <!-- قسم التطهير -->
-        <section id="view-cleanse" class="view-section active">
-            <div class="alert-box">
-                <svg width="24" height="24" fill="none" stroke="var(--secondary)" stroke-width="2" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-                <div>الصور التي تلتقطها بهاتفك تحتوي غالباً على <strong>موقعك الجغرافي الدقيق</strong> ونوع هاتفك. استخدم هذه الأداة لمسحها تماماً قبل مشاركتها.</div>
+        <!-- قسم الفحص والتطهير -->
+        <section id="view-forensics" class="view-section active">
+            <div class="file-drop-zone" id="drop-zone-img">
+                <div class="file-icon">📸</div>
+                <div class="file-instruction">اسحب وأفلت الصورة هنا للفحص</div>
+                <div style="color: var(--text-muted); font-size: 0.9rem; margin-top: 0.5rem;">(JPG, PNG, WEBP)</div>
+                <input type="file" id="file-input-img" accept="image/jpeg, image/png, image/webp">
             </div>
 
-            <div class="file-drop-zone" id="drop-zone">
-                <div class="file-icon">📸</div>
-                <div class="file-instruction">اسحب وأفلت الصورة هنا</div>
-                <div class="file-subtext">يدعم (JPG, PNG, WEBP) حتى 20MB</div>
-                <input type="file" id="file-input" accept="image/jpeg, image/png, image/webp">
-            </div>
+            <div id="exif-terminal" class="exif-terminal"></div>
 
             <div class="preview-container" id="preview-container">
-                <img id="image-preview" class="image-preview" alt="معاينة الصورة">
-                
-                <div class="stats-box">
-                    <div class="stat-item">
-                        <div class="stat-label">الحجم الأصلي</div>
-                        <div class="stat-value" id="stat-original">0 KB</div>
-                    </div>
-                    <div class="stat-item">
-                        <div class="stat-label">بعد التطهير</div>
-                        <div class="stat-value deleted" id="stat-clean">0 KB</div>
-                    </div>
+                <img id="image-preview" class="image-preview">
+                <div style="display: flex; gap: 10px;">
+                    <button class="btn-main" id="btn-download">⬇️ تحميل الصورة المطهرة</button>
+                    <button class="btn-main btn-secondary" id="btn-send-ready" style="flex: 0.5;">📡 إرسال P2P</button>
                 </div>
-
-                <button class="btn-main" id="btn-download">
-                    <span class="btn-text">⬇️ تحميل الصورة الآمنة</span>
-                    <div class="loader"></div>
-                </button>
             </div>
         </section>
 
-        <!-- قسم المعلومات -->
-        <section id="view-about" class="view-section">
-            <h2 style="margin-bottom: 1rem; color: var(--text);">ما هي البيانات الوصفية (EXIF)؟</h2>
-            <p style="color: var(--text-muted); line-height: 1.6; margin-bottom: 1.5rem;">
-                عندما تلتقط صورة، تقوم الكاميرا بتخزين بيانات خفية داخل ملف الصورة. هذه البيانات قد تشمل إحداثيات الـ GPS لموقعك، تاريخ ووقت التقاط الصورة، ونوع الجهاز المستخدم. مشاركة هذه الصور على الإنترنت قد يعرض <strong>خصوصيتك وموقع منزلك</strong> للخطر.
-            </p>
-            
-            <div style="background: rgba(0,0,0,0.3); padding: 1.5rem; border-radius: 12px; border: 1px solid var(--border);">
-                <h3 style="color: var(--secondary); margin-bottom: 1rem; font-size: 1.1rem;">لماذا "سِتْر" آمن تماماً؟</h3>
-                <ul class="info-list">
-                    <li><strong>بدون إنترنت (Offline):</strong> لا يتم رفع صورك إلى أي سيرفر أو سحابة. كل المعالجة تتم داخل متصفحك (في جهازك شخصياً).</li>
-                    <li><strong>تجريد هندسي:</strong> نقوم باستخراج "البيكسلات" (الألوان) فقط من صورتك، وإعادة رسمها في ملف جديد بالكامل، مما يضمن تدمير أي بيانات مخفية أو أكواد خبيثة مضمنة.</li>
-                    <li><strong>الجودة العالية:</strong> نحافظ على أبعاد صورتك الأصلية، ونستخدم أعلى جودة تصدير ممكنة للحفاظ على وضوح الصورة.</li>
-                </ul>
+        <!-- قسم إرسال الملفات P2P -->
+        <section id="view-send" class="view-section">
+            <div style="margin-bottom: 1rem; font-size: 0.9rem; color: var(--warning);">
+                ⚠️ يتم النقل مباشرة بين الأجهزة (End-to-End). لا توجد خوادم تخزين وسيطة.
             </div>
+            
+            <div class="p2p-box" id="send-step-1">
+                <h3 style="margin-bottom: 1rem;">1. اختر الملف للإرسال</h3>
+                <input type="file" id="p2p-file-input" style="width: 100%; margin-bottom: 1rem; color: var(--text);">
+                <button class="btn-main" id="btn-generate-offer">توليد شفرة الاتصال 🔑</button>
+            </div>
+
+            <div class="p2p-box" style="display: none;" id="send-step-2">
+                <h3 style="margin-bottom: 0.5rem;">2. انسخ الشفرة للمستلم</h3>
+                <div class="code-display" id="offer-code" title="انقر للنسخ">جاري التوليد...</div>
+                
+                <h3 style="margin-top: 1.5rem; margin-bottom: 0.5rem;">3. ألصق رد المستلم هنا</h3>
+                <input type="text" id="answer-input" class="code-input" placeholder="أدخل شفرة الرد هنا...">
+                <button class="btn-main" id="btn-connect-sender">بدء النقل المباشر 🚀</button>
+            </div>
+
+            <div class="progress-bar" id="sender-progress"><div class="progress-fill" id="sender-fill"></div></div>
+            <div class="status-text" id="sender-status"></div>
+        </section>
+
+        <!-- قسم استقبال الملفات P2P -->
+        <section id="view-receive" class="view-section">
+            <div class="p2p-box">
+                <h3 style="margin-bottom: 0.5rem;">1. ألصق شفرة المُرسل</h3>
+                <input type="text" id="offer-input" class="code-input" placeholder="أدخل الشفرة المستلمة...">
+                <button class="btn-main" id="btn-generate-answer">إنشاء شفرة الرد 🔐</button>
+            </div>
+
+            <div class="p2p-box" style="display: none;" id="receive-step-2">
+                <h3 style="margin-bottom: 0.5rem;">2. أعطِ هذا الرد للمُرسل</h3>
+                <div class="code-display" id="answer-code" title="انقر للنسخ">جاري التوليد...</div>
+                <div class="status-text">بانتظار بدء النقل من المرسل...</div>
+            </div>
+
+            <div class="progress-bar" id="receiver-progress"><div class="progress-fill" id="receiver-fill"></div></div>
+            <div class="status-text" id="receiver-status"></div>
         </section>
     </main>
-
-    <div class="transparency-footer">
-        يعمل بتقنية <span>HTML5 Canvas API</span> لمعالجة الصور محلياً.<br>
-        صُنع لحماية الخصوصية الرقمية للمستخدم العربي. 🛡️
-    </div>
 </div>
 
 <canvas id="processing-canvas"></canvas>
 <div class="toast" id="toast">تمت العملية!</div>
 
 <script>
-    // --- إعدادات التطبيق ---
-    const MAX_FILE_SIZE = 20 * 1024 * 1024; // 20 ميجابايت الحد الأقصى
-    let currentCleanBlob = null;
-    let originalFileName = "";
-
-    // --- إدارة التبويبات ---
+    // --- UI & Tabs Management ---
     const navBtns = document.querySelectorAll('.nav-btn');
     const views = document.querySelectorAll('.view-section');
-    
-    navBtns.forEach(btn => {
-        btn.addEventListener('click', () => {
-            navBtns.forEach(b => b.classList.remove('active'));
-            views.forEach(v => v.classList.remove('active'));
-            btn.classList.add('active');
-            document.getElementById(`view-${btn.dataset.view}`).classList.add('active');
-        });
-    });
+    function switchTab(viewName) {
+        navBtns.forEach(b => b.classList.remove('active'));
+        views.forEach(v => v.classList.remove('active'));
+        document.querySelector(`[data-view="${viewName}"]`).classList.add('active');
+        document.getElementById(`view-${viewName}`).classList.add('active');
+    }
+    navBtns.forEach(btn => btn.addEventListener('click', () => switchTab(btn.dataset.view)));
 
-    // --- الإشعارات ---
     let toastTimeout;
     function showToast(msg, isError = false) {
         const toast = document.getElementById('toast');
         toast.textContent = msg;
-        if(isError) toast.classList.add('error'); else toast.classList.remove('error');
-        toast.classList.add('show');
-        
+        toast.className = `toast show ${isError ? 'error' : ''}`;
         clearTimeout(toastTimeout);
         toastTimeout = setTimeout(() => toast.classList.remove('show'), 4000);
     }
 
-    function formatBytes(bytes) {
-        if(bytes === 0) return '0 B';
-        const k = 1024, sizes = ['B', 'KB', 'MB'];
-        const i = Math.floor(Math.log(bytes) / Math.log(k));
-        return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+    // --- 1. Forensics & EXIF Extraction ---
+    // A lightweight client-side EXIF parser targeted at Privacy-sensitive tags
+    function extractEXIF(buffer) {
+        const view = new DataView(buffer);
+        if (view.getUint16(0, false) !== 0xFFD8) return null; // Not a valid JPEG
+        
+        let offset = 2;
+        while (offset < view.byteLength) {
+            if (view.getUint16(offset, false) === 0xFFE1) { // APP1 Marker
+                const exifHeader = view.getUint32(offset + 4, false);
+                if (exifHeader !== 0x45786966) return null; // Not "Exif"
+                return parseTIFF(view, offset + 10);
+            }
+            offset += view.getUint16(offset + 2, false) + 2;
+        }
+        return null;
     }
 
-    // --- إدارة السحب والإفلات ---
-    const dropZone = document.getElementById('drop-zone');
-    const fileInput = document.getElementById('file-input');
-    const previewContainer = document.getElementById('preview-container');
-    const imagePreview = document.getElementById('image-preview');
-    const statOriginal = document.getElementById('stat-original');
-    const statClean = document.getElementById('stat-clean');
-
-    dropZone.addEventListener('click', () => fileInput.click());
-    
-    dropZone.addEventListener('dragover', (e) => {
-        e.preventDefault();
-        dropZone.classList.add('dragover');
-    });
-    
-    dropZone.addEventListener('dragleave', (e) => {
-        e.preventDefault();
-        dropZone.classList.remove('dragover');
-    });
-    
-    dropZone.addEventListener('drop', (e) => {
-        e.preventDefault();
-        dropZone.classList.remove('dragover');
-        if(e.dataTransfer.files.length) {
-            fileInput.files = e.dataTransfer.files;
-            processImage();
+    function parseTIFF(view, tiffOffset) {
+        const littleEndian = view.getUint16(tiffOffset, false) === 0x4949;
+        const ifd0Offset = view.getUint32(tiffOffset + 4, littleEndian);
+        let tags = {};
+        
+        function readTags(ifdOffset) {
+            const entries = view.getUint16(tiffOffset + ifdOffset, littleEndian);
+            for (let i = 0; i < entries; i++) {
+                const entryOffset = tiffOffset + ifdOffset + 2 + (i * 12);
+                const tag = view.getUint16(entryOffset, littleEndian);
+                const type = view.getUint16(entryOffset + 2, littleEndian);
+                const count = view.getUint32(entryOffset + 4, littleEndian);
+                const valueOffset = view.getUint32(entryOffset + 8, littleEndian);
+                
+                // Map important tags
+                if (tag === 0x010F) tags.Make = readString(tiffOffset + valueOffset, count);
+                if (tag === 0x0110) tags.Model = readString(tiffOffset + valueOffset, count);
+                if (tag === 0x0132) tags.DateTime = readString(tiffOffset + valueOffset, count);
+                if (tag === 0x8825) tags.GPSInfo = readGPS(tiffOffset + valueOffset, littleEndian);
+            }
         }
-    });
-
-    fileInput.addEventListener('change', processImage);
-
-    // --- اللب البرمجي: معالجة الصورة وتطهيرها ---
-    function processImage() {
-        if(fileInput.files.length === 0) return;
         
-        const file = fileInput.files[0];
-        
-        // التحقق من نوع الملف
-        if (!file.type.match(/image\/(jpeg|png|webp)/)) {
-            showToast("عذراً، الأداة تدعم صور JPG, PNG, WEBP فقط.", true);
-            fileInput.value = "";
-            return;
+        function readString(offset, len) {
+            let str = "";
+            for(let i=0; i<len-1; i++) str += String.fromCharCode(view.getUint8(offset + i));
+            return str;
         }
 
-        // التحقق من الحجم
-        if (file.size > MAX_FILE_SIZE) {
-            showToast(`الصورة كبيرة جداً! الحد الأقصى هو ${formatBytes(MAX_FILE_SIZE)}.`, true);
-            fileInput.value = "";
-            return;
+        function readGPS(gpsOffset, le) {
+            const entries = view.getUint16(tiffOffset + gpsOffset, le);
+            let gps = {};
+            for(let i=0; i<entries; i++) {
+                const entry = tiffOffset + gpsOffset + 2 + (i*12);
+                const tag = view.getUint16(entry, le);
+                if(tag === 1 || tag === 3) gps[tag===1?'LatRef':'LngRef'] = String.fromCharCode(view.getUint8(entry+8));
+                if(tag === 2 || tag === 4) gps[tag===2?'Lat':'Lng'] = "[تم رصد إحداثيات موقع جغرافية دقيقة]";
+            }
+            return Object.keys(gps).length > 0 ? gps : null;
         }
 
-        originalFileName = file.name;
-        const originalSize = file.size;
-        statOriginal.textContent = formatBytes(originalSize);
-        statClean.textContent = "جاري التطهير...";
-        
-        // إظهار منطقة المعاينة وإخفاء منطقة الإسقاط
-        dropZone.style.display = 'none';
-        previewContainer.style.display = 'block';
+        readTags(ifd0Offset);
+        return tags;
+    }
 
+    // --- Image Processing ---
+    const fileInputImg = document.getElementById('file-input-img');
+    const dropZoneImg = document.getElementById('drop-zone-img');
+    const terminal = document.getElementById('exif-terminal');
+    let currentCleanFile = null;
+
+    dropZoneImg.addEventListener('click', () => fileInputImg.click());
+    fileInputImg.addEventListener('change', handleImage);
+
+    async function handleImage() {
+        const file = fileInputImg.files[0];
+        if(!file) return;
+
+        terminal.style.display = 'block';
+        terminal.innerHTML = `> Analyzing ${file.name}...\n`;
+
+        // 1. Read EXIF
+        const buffer = await file.slice(0, 65536).arrayBuffer();
+        const exif = extractEXIF(buffer);
+        
+        if (exif && Object.keys(exif).length > 0) {
+            terminal.innerHTML += `<span class="danger">[!] تم العثور على بيانات وصفية مخفية:</span>\n`;
+            if(exif.Make) terminal.innerHTML += `<span class="key">Camera Make:</span> ${exif.Make}\n`;
+            if(exif.Model) terminal.innerHTML += `<span class="key">Device Model:</span> ${exif.Model}\n`;
+            if(exif.DateTime) terminal.innerHTML += `<span class="key">Date Taken:</span> ${exif.DateTime}\n`;
+            if(exif.GPSInfo) {
+                terminal.innerHTML += `<span class="danger">[CRITICAL] GPS Location Data Found!</span>\n`;
+                terminal.innerHTML += `Lat: ${exif.GPSInfo.LatRef} ${exif.GPSInfo.Lat}\n`;
+            }
+        } else {
+            terminal.innerHTML += `[OK] لم يتم العثور على بيانات EXIF خطيرة.\n`;
+        }
+
+        terminal.innerHTML += `\n> جاري تطهير الصورة وإعادة رسمها بالكامل...\n`;
+
+        // 2. Cleanse via Canvas
         const reader = new FileReader();
-        reader.onload = function(event) {
+        reader.onload = function(e) {
             const img = new Image();
             img.onload = function() {
-                // استخدام الـ Canvas لإعادة رسم الصورة (هذا يدمر أي بيانات EXIF)
                 const canvas = document.getElementById('processing-canvas');
+                canvas.width = img.width; canvas.height = img.height;
                 const ctx = canvas.getContext('2d');
-                
-                // الحفاظ على الأبعاد الأصلية
-                canvas.width = img.width;
-                canvas.height = img.height;
-                
-                // رسم الصورة البيكسل بالبيكسل
                 ctx.drawImage(img, 0, 0);
                 
-                // تحديد نوع التصدير بناءً على الأصل (PNG يحافظ على الشفافية، الباقي JPG لتقليل الحجم)
-                let exportMimeType = 'image/jpeg';
-                let quality = 0.95; // جودة عالية جداً
-                
-                if (file.type === 'image/png') {
-                    exportMimeType = 'image/png';
-                    quality = undefined; // PNG لا يستخدم بارامتر الجودة
-                } else if (file.type === 'image/webp') {
-                    exportMimeType = 'image/webp';
-                }
-
-                // تحويل الرسمة إلى ملف جديد نظيف
-                canvas.toBlob(function(blob) {
-                    currentCleanBlob = blob;
+                canvas.toBlob(blob => {
+                    const safeName = `Sitr_Cleaned_${file.name.replace(/\.[^/.]+$/, "")}.jpg`;
+                    currentCleanFile = new File([blob], safeName, { type: 'image/jpeg' });
                     
-                    // تحديث الإحصائيات
-                    statClean.textContent = formatBytes(blob.size);
+                    document.getElementById('image-preview').src = URL.createObjectURL(blob);
+                    document.getElementById('preview-container').style.display = 'block';
+                    dropZoneImg.style.display = 'none';
                     
-                    // عرض الصورة المنظفة
-                    const cleanUrl = URL.createObjectURL(blob);
-                    imagePreview.src = cleanUrl;
-                    
-                    showToast("✨ تم تطهير الصورة بنجاح وتجريدها من البيانات السرية!");
-                    
-                    // تحرير الذاكرة
-                    URL.revokeObjectURL(event.target.result);
-                }, exportMimeType, quality);
+                    terminal.innerHTML += `[SUCCESS] تم التطهير! الصورة الآن آمنة 100%.\n`;
+                    showToast("✨ تم التطهير بنجاح!");
+                }, 'image/jpeg', 0.95);
             };
-            img.src = event.target.result;
+            img.src = e.target.result;
         };
         reader.readAsDataURL(file);
     }
 
-    // --- تحميل الصورة المنظفة ---
-    const btnDownload = document.getElementById('btn-download');
-    btnDownload.addEventListener('click', () => {
-        if (!currentCleanBlob) return;
-
-        // تجهيز اسم ملف آمن
-        const safeName = originalFileName.replace(/\.[^/.]+$/, ""); // إزالة الامتداد القديم
-        const extension = currentCleanBlob.type.split('/')[1] === 'jpeg' ? 'jpg' : currentCleanBlob.type.split('/')[1];
-        const finalName = `Sitr_Clean_${safeName}.${extension}`;
-
-        const url = URL.createObjectURL(currentCleanBlob);
+    document.getElementById('btn-download').addEventListener('click', () => {
+        if(!currentCleanFile) return;
         const a = document.createElement('a');
-        a.href = url;
-        a.download = finalName;
-        document.body.appendChild(a);
+        a.href = URL.createObjectURL(currentCleanFile);
+        a.download = currentCleanFile.name;
         a.click();
-        document.body.removeChild(a);
-        
-        setTimeout(() => URL.revokeObjectURL(url), 1000);
-        showToast("✅ تم تحميل الصورة الآمنة!");
-        
-        // إعادة تهيئة الأداة لصورة جديدة بعد 3 ثواني
-        setTimeout(() => {
-            dropZone.style.display = 'block';
-            previewContainer.style.display = 'none';
-            fileInput.value = "";
-            currentCleanBlob = null;
-        }, 3000);
     });
 
+    document.getElementById('btn-send-ready').addEventListener('click', () => {
+        if(!currentCleanFile) return;
+        switchTab('send');
+        // Simulate file selection in WebRTC sender
+        const dataTransfer = new DataTransfer();
+        dataTransfer.items.add(currentCleanFile);
+        document.getElementById('p2p-file-input').files = dataTransfer.files;
+        showToast("الصورة جاهزة للإرسال الآمن");
+    });
+
+    // --- 2. WebRTC P2P Transfer (LocalSend Replica) ---
+    const configuration = { iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] };
+    let peerConnection;
+    let dataChannel;
+    const CHUNK_SIZE = 16384; // 16KB standard size
+
+    // Helper: Copy to clipboard
+    document.querySelectorAll('.code-display').forEach(el => {
+        el.addEventListener('click', () => {
+            navigator.clipboard.writeText(el.innerText);
+            showToast("تم نسخ الشفرة!");
+        });
+    });
+
+    // Sender Logic
+    document.getElementById('btn-generate-offer').addEventListener('click', async () => {
+        const file = document.getElementById('p2p-file-input').files[0];
+        if(!file) return showToast("اختر ملفاً أولاً", true);
+
+        document.getElementById('send-step-2').style.display = 'block';
+        document.getElementById('offer-code').innerText = "جاري الاتصال بالشبكة...";
+
+        peerConnection = new RTCPeerConnection(configuration);
+        dataChannel = peerConnection.createDataChannel('fileTransfer');
+        
+        setupDataChannelSender(file);
+
+        peerConnection.onicecandidate = e => {
+            if (!e.candidate) { // Gathering finished
+                const code = btoa(JSON.stringify(peerConnection.localDescription));
+                document.getElementById('offer-code').innerText = code;
+            }
+        };
+
+        const offer = await peerConnection.createOffer();
+        await peerConnection.setLocalDescription(offer);
+    });
+
+    document.getElementById('btn-connect-sender').addEventListener('click', async () => {
+        const answerCode = document.getElementById('answer-input').value;
+        if(!answerCode) return showToast("أدخل شفرة الرد", true);
+        try {
+            const answer = JSON.parse(atob(answerCode));
+            await peerConnection.setRemoteDescription(answer);
+            document.getElementById('sender-status').innerText = "جاري إنشاء الاتصال...";
+        } catch (e) {
+            showToast("شفرة الرد غير صالحة", true);
+        }
+    });
+
+    function setupDataChannelSender(file) {
+        dataChannel.onopen = () => {
+            document.getElementById('sender-status').innerText = "متصل! جاري النقل...";
+            document.getElementById('sender-progress').style.display = 'block';
+            
+            // Send Metadata first
+            dataChannel.send(JSON.stringify({ type: 'meta', name: file.name, size: file.size, mime: file.type }));
+            
+            // Send File in chunks
+            const reader = new FileReader();
+            let offset = 0;
+            
+            reader.onload = e => {
+                dataChannel.send(e.target.result);
+                offset += e.target.result.byteLength;
+                document.getElementById('sender-fill').style.width = `${(offset / file.size) * 100}%`;
+                
+                if (offset < file.size) {
+                    readSlice(offset);
+                } else {
+                    document.getElementById('sender-status').innerText = "✅ تم الإرسال بنجاح!";
+                    dataChannel.send(JSON.stringify({ type: 'eof' })); // End of file flag
+                }
+            };
+            
+            const readSlice = o => {
+                const slice = file.slice(offset, o + CHUNK_SIZE);
+                reader.readAsArrayBuffer(slice);
+            };
+            
+            readSlice(0);
+        };
+    }
+
+    // Receiver Logic
+    document.getElementById('btn-generate-answer').addEventListener('click', async () => {
+        const offerCode = document.getElementById('offer-input').value;
+        if(!offerCode) return showToast("أدخل شفرة المرسل", true);
+
+        try {
+            const offer = JSON.parse(atob(offerCode));
+            peerConnection = new RTCPeerConnection(configuration);
+            
+            peerConnection.ondatachannel = e => {
+                dataChannel = e.channel;
+                setupDataChannelReceiver();
+            };
+
+            peerConnection.onicecandidate = e => {
+                if (!e.candidate) {
+                    const code = btoa(JSON.stringify(peerConnection.localDescription));
+                    document.getElementById('answer-code').innerText = code;
+                    document.getElementById('receive-step-2').style.display = 'block';
+                }
+            };
+
+            await peerConnection.setRemoteDescription(offer);
+            const answer = await peerConnection.createAnswer();
+            await peerConnection.setLocalDescription(answer);
+            
+        } catch (e) {
+            showToast("شفرة المرسل غير صالحة", true);
+        }
+    });
+
+    function setupDataChannelReceiver() {
+        let receiveBuffer = [];
+        let receivedSize = 0;
+        let fileMeta = null;
+
+        dataChannel.onmessage = e => {
+            document.getElementById('receiver-progress').style.display = 'block';
+            
+            if (typeof e.data === 'string') {
+                const msg = JSON.parse(e.data);
+                if (msg.type === 'meta') {
+                    fileMeta = msg;
+                    document.getElementById('receiver-status').innerText = `استقبال: ${fileMeta.name}...`;
+                } else if (msg.type === 'eof') {
+                    const blob = new Blob(receiveBuffer, { type: fileMeta.mime });
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = fileMeta.name;
+                    a.click();
+                    
+                    document.getElementById('receiver-status').innerText = "✅ تم الاستقبال والتحميل!";
+                    receiveBuffer = []; // Clear memory
+                }
+            } else {
+                // ArrayBuffer chunks
+                receiveBuffer.push(e.data);
+                receivedSize += e.data.byteLength;
+                if(fileMeta) {
+                    document.getElementById('receiver-fill').style.width = `${(receivedSize / fileMeta.size) * 100}%`;
+                }
+            }
+        };
+    }
 </script>
 </body>
 </html>
