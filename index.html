@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="description" content="سِـتْـر - تطهير الصور من بيانات التتبع، نقل مشفر P2P، وبصمة رقمية">
-    <!-- تحديث سياسات الأمان -->
+    <!-- سياسات أمان محدثة وصارمة -->
     <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src *;">
     <meta name="referrer" content="no-referrer">
     <title>سِـتْـر | حماية ونقل الملفات السرية</title>
@@ -13,211 +13,207 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;800;900&family=Fira+Code:wght@500;700&display=swap" rel="stylesheet">
     
-    <!-- PeerJS للنقل المباشر -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/peerjs/1.5.2/peerjs.min.js"></script>
-    <!-- Exifr لاستخراج جميع بيانات الميتا والـ GPS بدقة لعرضها قبل تدميرها -->
     <script src="https://cdn.jsdelivr.net/npm/exifr/dist/lite.umd.js"></script>
 
 <style>
 :root {
-    --bg: #030a10;
-    --surface: #0d1520;
-    --surface2: #162030;
-    --border: #1e3048;
-    --border2: #2a4060;
-    --text: #e8f4ff;
-    --muted: #607a96;
-    --primary: #00d4a0;
-    --primary-dim: rgba(0,212,160,0.12);
-    --primary-glow: rgba(0,212,160,0.35);
-    --blue: #4d9fff;
-    --blue-dim: rgba(77,159,255,0.12);
-    --danger: #ff5055;
-    --warning: #ffb830;
-    --purple: #a78bfa;
-    --r: 16px;
-    --t: all 0.3s cubic-bezier(.4,0,.2,1);
+    --bg: #030a10; --surface: #0d1520; --surface2: #162030;
+    --border: #1e3048; --border2: #2a4060; --text: #e8f4ff;
+    --muted: #607a96; --primary: #00d4a0; --primary-dim: rgba(0,212,160,0.12);
+    --primary-glow: rgba(0,212,160,0.35); --blue: #4d9fff;
+    --blue-dim: rgba(77,159,255,0.12); --danger: #ff5055;
+    --warning: #ffb830; --purple: #a78bfa;
+    --r: 16px; --t: all 0.3s cubic-bezier(.4,0,.2,1);
 }
 
-* { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Cairo', sans-serif; -webkit-tap-highlight-color: transparent; }
+* { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Cairo', sans-serif; -webkit-tap-highlight-color: transparent; outline: none; }
 html { scroll-behavior: smooth; }
 body {
     background: var(--bg); color: var(--text); min-height: 100vh;
-    display: flex; flex-direction: column; align-items: center; padding: 2rem 1rem 4rem;
+    display: flex; flex-direction: column; align-items: center; padding: 1.5rem 1rem 3rem;
     background-image:
-        radial-gradient(ellipse 60% 40% at 10% 20%, rgba(0,212,160,0.06) 0%, transparent 60%),
-        radial-gradient(ellipse 50% 40% at 90% 70%, rgba(77,159,255,0.06) 0%, transparent 60%),
-        radial-gradient(ellipse 30% 60% at 50% 100%, rgba(167,139,250,0.04) 0%, transparent 60%);
+        radial-gradient(ellipse 60% 40% at 10% 20%, rgba(0,212,160,0.05) 0%, transparent 60%),
+        radial-gradient(ellipse 50% 40% at 90% 70%, rgba(77,159,255,0.05) 0%, transparent 60%),
+        radial-gradient(ellipse 30% 60% at 50% 100%, rgba(167,139,250,0.03) 0%, transparent 60%);
     background-attachment: fixed;
 }
 
 .app { width: 100%; max-width: 600px; position: relative; }
 header { text-align: center; margin-bottom: 2rem; position: relative; }
+
+/* تم إصلاح مشكلة انقطاع العنوان على الشاشات الصغيرة */
 .brand {
-    font-size: 3.5rem; font-weight: 900; letter-spacing: -1.5px;
+    font-size: clamp(2.5rem, 8vw, 3.8rem); font-weight: 900; letter-spacing: -1px;
     background: linear-gradient(135deg, #fff 30%, var(--primary) 80%);
     -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-    display: flex; align-items: center; justify-content: center; gap: 10px; line-height: 1;
+    display: flex; align-items: center; justify-content: center; gap: 8px; line-height: 1.2;
+    flex-wrap: nowrap; white-space: nowrap;
 }
 
-.gem-wrap { position: relative; display: inline-flex; align-items: center; justify-content: center; width: 48px; height: 48px; }
-.gem-wrap svg { filter: drop-shadow(0 0 10px rgba(77,159,255,0.8)); animation: gemFloat 4s ease-in-out infinite; }
+.gem-wrap { position: relative; display: inline-flex; align-items: center; justify-content: center; width: clamp(35px, 10vw, 48px); height: clamp(35px, 10vw, 48px); flex-shrink: 0; }
+.gem-wrap svg { width: 100%; height: 100%; filter: drop-shadow(0 0 10px rgba(77,159,255,0.8)); animation: gemFloat 4s ease-in-out infinite; }
 @keyframes gemFloat {
     0%,100% { transform: translateY(0) rotate(0deg); filter: drop-shadow(0 0 10px rgba(77,159,255,0.8)) drop-shadow(0 0 20px rgba(0,212,160,0.4)); }
-    50% { transform: translateY(-8px) rotate(3deg); filter: drop-shadow(0 0 15px rgba(77,159,255,1)) drop-shadow(0 0 25px rgba(167,139,250,0.6)); }
+    50% { transform: translateY(-6px) rotate(3deg); filter: drop-shadow(0 0 15px rgba(77,159,255,1)) drop-shadow(0 0 25px rgba(167,139,250,0.6)); }
 }
-.tagline { color: var(--muted); font-size: 0.95rem; font-weight: 600; margin-top: 0.5rem; letter-spacing: 0.5px; }
+.tagline { color: var(--muted); font-size: clamp(0.85rem, 3vw, 0.95rem); font-weight: 600; margin-top: 0.5rem; }
 
+/* Nav قابلة للتمرير على الهواتف */
 .nav {
     display: flex; background: rgba(13,21,32,0.85); border: 1px solid var(--border);
     border-radius: var(--r); padding: 6px; margin-bottom: 1.5rem; gap: 4px;
     position: sticky; top: 10px; z-index: 100; backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
-    box-shadow: 0 10px 30px -10px rgba(0,0,0,0.5);
+    box-shadow: 0 10px 30px -10px rgba(0,0,0,0.5); overflow-x: auto; scrollbar-width: none;
 }
+.nav::-webkit-scrollbar { display: none; }
 .nav-btn {
-    flex: 1; background: transparent; border: none; color: var(--muted);
-    font-size: 0.85rem; font-weight: 700; padding: 0.75rem 0.2rem; border-radius: 12px; cursor: pointer;
+    flex: 1; min-width: 80px; background: transparent; border: none; color: var(--muted);
+    font-size: 0.85rem; font-weight: 800; padding: 0.8rem 0.4rem; border-radius: 12px; cursor: pointer;
     transition: var(--t); white-space: nowrap; display: flex; align-items: center; justify-content: center; gap: 5px;
 }
 .nav-btn.active { background: var(--surface2); color: var(--primary); box-shadow: 0 2px 10px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.05); }
 .nav-btn:hover:not(.active){ color: var(--text); background: rgba(255,255,255,0.03); }
 
 .card {
-    background: rgba(13,21,32,0.7); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);
+    background: rgba(13,21,32,0.75); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);
     border: 1px solid var(--border); border-radius: var(--r); padding: 1.8rem;
     box-shadow: 0 32px 64px -16px rgba(0,0,0,0.7), inset 0 1px 0 rgba(255,255,255,0.03);
 }
-.view { display: none; animation: fadeUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; opacity: 0; transform: translateY(15px); }
+.view { display: none; animation: fadeUp 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards; opacity: 0; transform: translateY(10px); }
 .view.active { display: block; }
 @keyframes fadeUp { to { opacity: 1; transform: translateY(0); } }
 
+/* توحيد الـ Drop Zones */
 .drop-zone {
     border: 2px dashed var(--border2); border-radius: 14px; padding: 2.5rem 1rem;
-    text-align: center; cursor: pointer; transition: var(--t); background: rgba(255,255,255,0.01);
-    position: relative; overflow: hidden;
+    text-align: center; cursor: pointer; transition: var(--t); background: rgba(255,255,255,0.015);
+    position: relative; overflow: hidden; display: flex; flex-direction: column; align-items: center; justify-content: center;
 }
-.drop-zone:hover, .drop-zone.drag-over { border-color: var(--primary); background: var(--primary-dim); transform: scale(1.01); }
-.drop-icon { font-size: 2.8rem; margin-bottom: 0.8rem; display: block; transition: var(--t); }
-.drop-zone:hover .drop-icon { transform: translateY(-5px); }
-.drop-title { font-size: 1.05rem; font-weight: 800; margin-bottom: 0.4rem; color: var(--text); }
-.drop-sub { font-size: 0.85rem; color: var(--muted); font-weight: 600; }
+.drop-zone.sm { padding: 1.5rem 1rem; }
+.drop-zone:hover, .drop-zone.drag-over { border-color: var(--primary); background: var(--primary-dim); }
+.drop-icon { font-size: 2.5rem; margin-bottom: 0.8rem; transition: var(--t); }
+.drop-zone:hover .drop-icon { transform: translateY(-4px) scale(1.05); }
+.drop-title { font-size: 1rem; font-weight: 800; margin-bottom: 0.4rem; color: var(--text); }
+.drop-sub { font-size: 0.8rem; color: var(--muted); font-weight: 600; }
+.file-name-display { margin-top: 10px; font-size: 0.85rem; color: var(--blue); font-weight: 700; background: var(--blue-dim); padding: 4px 12px; border-radius: 20px; display: none; word-break: break-all; }
 
 .threat-panel { display: none; margin-bottom: 1.5rem; border-radius: 12px; overflow: hidden; border: 1px solid var(--border); }
-.threat-head { background: var(--surface2); padding: 0.9rem 1.2rem; display: flex; justify-content: space-between; align-items: center; font-weight: 800; font-size: 0.95rem; }
+.threat-head { background: var(--surface2); padding: 0.9rem 1.2rem; display: flex; justify-content: space-between; align-items: center; font-weight: 800; font-size: 0.9rem; }
 .badge { padding: 4px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 800; background: var(--danger); color: #fff; box-shadow: 0 0 10px rgba(255,80,85,0.3); }
 .badge.safe { background: var(--primary); color: #000; box-shadow: 0 0 10px var(--primary-glow); }
 .badge.warn { background: var(--warning); color: #000; }
 .threat-body { 
     background: #05080c; padding: 1rem; font-family: 'Fira Code', monospace; 
     font-size: 0.8rem; direction: ltr; text-align: left; 
-    max-height: 250px; overflow-y: auto; border-top: 1px solid rgba(255,255,255,0.05);
+    max-height: 280px; overflow-y: auto; border-top: 1px solid rgba(255,255,255,0.05);
 }
-.threat-body::-webkit-scrollbar { width: 6px; }
+.threat-body::-webkit-scrollbar { width: 5px; }
 .threat-body::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 10px; }
 .t-row { padding: 0.5rem 0; border-bottom: 1px dashed rgba(255,255,255,0.08); display: flex; gap: 12px; align-items: flex-start; }
 .t-row:last-child { border-bottom: none; }
-.t-label { color: var(--muted); width: 100px; flex-shrink: 0; font-weight: 600; }
+.t-label { color: var(--muted); min-width: 120px; flex-shrink: 0; font-weight: 600; }
 .t-val { color: var(--primary); font-weight: 700; word-break: break-word; }
 .t-val.bad { color: var(--warning); }
 
 .preview-wrap { display: none; text-align: center; margin-top: 1.5rem; animation: fadeUp 0.4s forwards; }
-.img-preview { max-width: 100%; max-height: 240px; border-radius: 12px; border: 2px solid var(--primary); margin-bottom: 1.2rem; box-shadow: 0 10px 30px var(--primary-dim); object-fit: contain; background: #000; }
+.img-preview { max-width: 100%; max-height: 220px; border-radius: 12px; border: 2px solid var(--primary); margin-bottom: 1.2rem; box-shadow: 0 10px 30px var(--primary-dim); object-fit: contain; background: #000; }
 
 .btn {
-    width: 100%; padding: 1.1rem; background: linear-gradient(135deg, var(--primary), var(--blue));
+    width: 100%; padding: 1rem; background: linear-gradient(135deg, var(--primary), var(--blue));
     color: #000; border: none; border-radius: 12px; font-size: 1rem; font-weight: 900;
     cursor: pointer; transition: var(--t); display: flex; align-items: center; justify-content: center; gap: 0.6rem; margin-bottom: 0.8rem;
 }
 .btn:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 8px 20px var(--primary-glow); filter: brightness(1.1); }
 .btn:active:not(:disabled) { transform: translateY(0); }
 .btn:disabled { background: var(--surface2); color: var(--muted); cursor: not-allowed; box-shadow: none; transform: none; opacity: 0.6; }
-.btn.ghost { background: transparent; border: 2px solid var(--blue); color: var(--blue); }
-.btn.ghost:hover:not(:disabled) { background: var(--blue-dim); color: #fff; box-shadow: 0 4px 16px rgba(77,159,255,0.2); }
-.btn.purple-ghost { background: transparent; border: 2px solid var(--purple); color: var(--purple); }
-.btn.purple-ghost:hover:not(:disabled) { background: rgba(167,139,250,0.1); color: #fff; box-shadow: 0 4px 16px rgba(167,139,250,0.2); }
-.btn-sm { padding: 0.6rem 1rem; font-size: 0.85rem; width: auto; border-radius: 8px; margin: 0; }
+.btn.ghost { background: transparent; border: 2px solid var(--blue); color: var(--text); }
+.btn.ghost:hover:not(:disabled) { background: var(--blue-dim); border-color: var(--blue); box-shadow: 0 4px 16px rgba(77,159,255,0.2); }
+.btn.purple-ghost { background: transparent; border: 2px solid var(--purple); color: var(--text); }
+.btn.purple-ghost:hover:not(:disabled) { background: rgba(167,139,250,0.1); border-color: var(--purple); box-shadow: 0 4px 16px rgba(167,139,250,0.2); }
+.btn-sm { padding: 0.6rem; font-size: 1.1rem; width: auto; border-radius: 10px; margin: 0; }
 
-.p2p-box { background: rgba(0,0,0,0.2); border: 1px solid var(--border); padding: 1.5rem; border-radius: 14px; margin-bottom: 1.5rem; transition: var(--t); }
-.p2p-box:hover { border-color: var(--border2); }
-.step-title { font-size: 1.05rem; color: var(--text); margin-bottom: 1rem; font-weight: 800; display: flex; align-items: center; gap: 0.6rem; }
-.step-title i { color: var(--primary); }
+.p2p-box { background: rgba(0,0,0,0.25); border: 1px solid var(--border); padding: 1.4rem; border-radius: 14px; margin-bottom: 1.2rem; }
+.step-title { font-size: 1rem; color: var(--text); margin-bottom: 1rem; font-weight: 800; display: flex; align-items: center; gap: 0.6rem; }
+.step-title i { font-style: normal; color: var(--primary); }
 
-.short-code-wrapper { display: flex; align-items: center; gap: 10px; margin: 1.5rem 0; }
+.short-code-wrapper { display: flex; align-items: center; gap: 8px; margin: 1.2rem 0; }
 .short-code-display {
     flex: 1; background: #05080c; border: 2px dashed var(--primary); border-radius: 12px;
-    padding: 1.2rem; text-align: center; font-family: 'Fira Code', monospace;
-    font-size: 3rem; font-weight: 800; letter-spacing: 12px; color: var(--primary);
-    text-transform: uppercase; box-shadow: inset 0 0 20px rgba(0,0,0,0.5); text-shadow: 0 0 10px var(--primary-glow);
+    padding: 1rem; text-align: center; font-family: 'Fira Code', monospace;
+    font-size: clamp(2rem, 6vw, 2.8rem); font-weight: 800; letter-spacing: 8px; color: var(--primary);
+    text-transform: uppercase; box-shadow: inset 0 0 20px rgba(0,0,0,0.5);
 }
 .code-input-short {
     width: 100%; background: #05080c; border: 2px solid var(--border); color: var(--blue);
-    padding: 1.2rem; border-radius: 12px; font-family: 'Fira Code', monospace; direction: ltr;
-    outline: none; font-size: 2.5rem; font-weight: 800; letter-spacing: 12px;
+    padding: 1.2rem 1rem; border-radius: 12px; font-family: 'Fira Code', monospace; direction: ltr;
+    font-size: clamp(1.8rem, 5vw, 2.5rem); font-weight: 800; letter-spacing: 10px;
     text-align: center; transition: var(--t); text-transform: uppercase;
-    margin-bottom: 1.5rem; box-shadow: inset 0 0 10px rgba(0,0,0,0.5);
+    margin-bottom: 1.2rem; box-shadow: inset 0 0 10px rgba(0,0,0,0.5);
 }
 .code-input-short:focus { border-color: var(--blue); box-shadow: 0 0 20px var(--blue-dim), inset 0 0 10px rgba(0,0,0,0.5); }
 .code-input-short::placeholder { color: var(--border2); }
 
-.info { background: rgba(255,184,48,0.08); border: 1px solid rgba(255,184,48,0.2); color: var(--warning); padding: 1rem; border-radius: 12px; font-size: 0.85rem; margin-bottom: 1.5rem; line-height: 1.7; font-weight: 600; }
+.info { background: rgba(255,184,48,0.08); border: 1px solid rgba(255,184,48,0.2); color: var(--warning); padding: 1rem; border-radius: 12px; font-size: 0.85rem; margin-bottom: 1.2rem; line-height: 1.7; font-weight: 600; }
 .info.blue-info { background: var(--blue-dim); border-color: rgba(77,159,255,0.2); color: var(--blue); }
 .info.purple-info { background: rgba(167,139,250,0.08); border-color: rgba(167,139,250,0.2); color: var(--purple); }
 .info.green-info { background: var(--primary-dim); border-color: rgba(0,212,160,0.2); color: var(--primary); }
 
-.progress-wrap { display: none; width: 100%; height: 24px; background: #05080c; border-radius: 20px; overflow: hidden; margin-top: 1.5rem; border: 1px solid var(--border); position: relative; box-shadow: inset 0 2px 5px rgba(0,0,0,0.5); }
+.progress-wrap { display: none; width: 100%; height: 22px; background: #05080c; border-radius: 20px; overflow: hidden; margin-top: 1.2rem; border: 1px solid var(--border); position: relative; box-shadow: inset 0 2px 5px rgba(0,0,0,0.5); }
 .progress-bar { height: 100%; background: linear-gradient(90deg, var(--blue), var(--primary)); width: 0%; transition: width 0.2s ease; position: relative; overflow: hidden; }
 .progress-bar::after { content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: linear-gradient(45deg, rgba(255,255,255,0.15) 25%, transparent 25%, transparent 50%, rgba(255,255,255,0.15) 50%, rgba(255,255,255,0.15) 75%, transparent 75%, transparent); background-size: 20px 20px; animation: progressStripes 1s linear infinite; }
 @keyframes progressStripes { from { background-position: 20px 0; } to { background-position: 0 0; } }
-.progress-label { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 0.8rem; font-weight: 900; color: #fff; text-shadow: 0 1px 3px rgba(0,0,0,0.9); z-index: 2; }
-.status { margin-top: 12px; text-align: center; color: var(--text); font-weight: 700; font-size: 0.95rem; }
+.progress-label { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 0.75rem; font-weight: 900; color: #fff; text-shadow: 0 1px 3px rgba(0,0,0,0.9); z-index: 2; direction: ltr; }
+.status { margin-top: 10px; text-align: center; color: var(--text); font-weight: 700; font-size: 0.9rem; }
 
-.steg-preview { max-width: 100%; max-height: 200px; border-radius: 10px; border: 2px solid var(--purple); box-shadow: 0 0 20px rgba(167,139,250,0.3); margin-bottom: 1rem; display: none; object-fit: contain; }
+/* Steganography UI */
+.steg-preview { max-width: 100%; max-height: 180px; border-radius: 10px; border: 2px solid var(--purple); box-shadow: 0 0 20px rgba(167,139,250,0.2); margin-bottom: 1rem; display: none; object-fit: contain; }
 .steg-textarea {
     width: 100%; background: #05080c; border: 1px solid var(--border); color: var(--text); padding: 1rem;
-    border-radius: 10px; font-size: 0.9rem; resize: vertical; min-height: 100px; outline: none;
+    border-radius: 10px; font-size: 0.9rem; resize: vertical; min-height: 100px; max-height: 250px; outline: none;
     font-family: 'Cairo', sans-serif; transition: var(--t); font-weight: 600; margin-bottom: 1rem;
 }
 .steg-textarea:focus { border-color: var(--purple); box-shadow: 0 0 0 3px rgba(167,139,250,0.15); }
-.steg-strength { display: flex; gap: 8px; margin-bottom: 1.5rem; flex-wrap: wrap; }
+
+/* حقول تسمية الملف */
+.file-settings { display: flex; gap: 8px; margin-bottom: 1rem; flex-wrap: wrap; }
+.steg-input {
+    flex: 2; min-width: 150px; background: #05080c; border: 1px solid var(--border); color: var(--text); padding: 0.8rem;
+    border-radius: 8px; font-size: 0.85rem; font-family: 'Cairo'; outline: none; transition: var(--t);
+}
+.steg-input:focus { border-color: var(--purple); }
+.steg-select {
+    flex: 1; min-width: 100px; background: #05080c; border: 1px solid var(--border); color: var(--purple); padding: 0.8rem;
+    border-radius: 8px; font-size: 0.85rem; font-weight: 700; cursor: pointer; outline: none;
+}
+
+.steg-strength { display: flex; gap: 6px; margin-bottom: 1.2rem; flex-wrap: wrap; }
 .strength-btn {
     flex: 1; min-width: 80px; background: var(--surface2); border: 1px solid var(--border); color: var(--muted);
-    padding: 0.7rem 0.4rem; border-radius: 8px; cursor: pointer; font-weight: 800; font-size: 0.8rem; transition: var(--t); text-align: center;
+    padding: 0.7rem 0.2rem; border-radius: 8px; cursor: pointer; font-weight: 800; font-size: 0.75rem; transition: var(--t); text-align: center;
 }
 .strength-btn.active { background: rgba(167,139,250,0.15); border-color: var(--purple); color: var(--purple); }
 
-.extract-out { display: none; background: #05080c; border: 1px dashed var(--border); padding: 1rem; border-radius: 10px; margin-top: 1rem; font-size: 0.95rem; word-break: break-word; line-height: 1.6; }
+.extract-out { display: none; background: #05080c; border: 1px dashed var(--border); padding: 1rem; border-radius: 10px; margin-top: 1rem; font-size: 0.9rem; word-break: break-word; line-height: 1.6; max-height: 200px; overflow-y: auto; }
 
-.footer { margin-top: 2rem; text-align: center; font-size: 0.85rem; color: var(--muted); line-height: 1.8; padding: 1rem; font-weight: 600; }
+.footer { margin-top: 1.5rem; text-align: center; font-size: 0.8rem; color: var(--muted); line-height: 1.6; padding: 1rem; font-weight: 600; }
 .footer strong { color: var(--text); }
 
 .toast {
     position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(100px);
-    background: var(--text); color: var(--bg); padding: 1rem 2rem; border-radius: 30px;
+    background: var(--text); color: var(--bg); padding: 0.9rem 1.5rem; border-radius: 30px;
     font-weight: 800; box-shadow: 0 15px 35px rgba(0,0,0,0.6); transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55); opacity: 0; z-index: 9999;
-    text-align: center; width: max-content; max-width: 90%; font-size: 0.95rem; display: flex; align-items: center; gap: 8px;
+    text-align: center; width: max-content; max-width: 90%; font-size: 0.9rem; display: flex; align-items: center; gap: 8px; pointer-events: none;
 }
 .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
 .toast.err { background: var(--danger); color: #fff; }
 .toast.ok { background: var(--primary); color: #000; }
 .toast.warn { background: var(--warning); color: #000; }
 
-input[type="file"].file-styled {
-    width: 100%; background: #05080c; padding: 12px; border-radius: 10px; border: 1px solid var(--border);
-    color: var(--text); margin-bottom: 1rem; cursor: pointer; font-family: 'Cairo';
-}
-input[type="file"].file-styled::-webkit-file-upload-button {
-    background: var(--surface2); color: var(--text); border: none; padding: 8px 16px; border-radius: 6px; margin-inline-end: 10px; cursor: pointer; font-weight: 700; transition: var(--t);
-}
-input[type="file"].file-styled::-webkit-file-upload-button:hover { background: var(--border2); }
-
-@media(max-width: 540px) {
-    .card { padding: 1.5rem 1rem; border-radius: 20px; border-left: none; border-right: none; }
-    .brand { font-size: 2.6rem; }
-    .nav { padding: 4px; border-radius: 14px; top: 5px; }
-    .nav-btn { font-size: 0.75rem; padding: 0.7rem 0.1rem; gap: 3px; }
-    .short-code-display { font-size: 2.2rem; letter-spacing: 8px; padding: 1rem; }
-    .code-input-short { font-size: 2rem; letter-spacing: 8px; padding: 1rem; }
-    .btn { font-size: 0.95rem; padding: 1rem; }
+@media(max-width: 480px) {
+    .card { padding: 1.5rem 1rem; border-radius: 20px; border-left: none; border-right: none; border-top: 1px solid var(--border); }
+    .nav { border-radius: 12px; }
+    .steg-input, .steg-select { flex: 100%; } /* تكديس الحقول عمودياً على الهواتف الصغيرة جداً */
 }
 </style>
 </head>
@@ -228,7 +224,7 @@ input[type="file"].file-styled::-webkit-file-upload-button:hover { background: v
     <h1 class="brand">
         سِـتْـر
         <span class="gem-wrap">
-            <svg width="40" height="40" viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <svg viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <polygon points="22,4 38,14 38,30 22,40 6,30 6,14" fill="url(#g1)" stroke="rgba(255,255,255,0.3)" stroke-width="1"/>
                 <polygon points="22,4 38,14 22,20" fill="url(#g2)" opacity="0.9"/>
                 <polygon points="22,4 6,14 22,20" fill="url(#g3)" opacity="0.8"/>
@@ -263,28 +259,28 @@ input[type="file"].file-styled::-webkit-file-upload-button:hover { background: v
 
     <!-- ══ 1. تطهير (Forensics) ══ -->
     <section id="view-forensics" class="view active">
-        <div class="info green-info">📸 <b>خصوصية تامة:</b> يتم فحص الصورة وإزالة مسارات الكاميرا والموقع الجغرافي (EXIF) في جهازك دون رفعها لأي سيرفر.</div>
+        <div class="info green-info">📸 <b>فحص محلي:</b> يتم فحص صورتك واستخراج مسارات الكاميرا (GPS, الأجهزة) ثم تدميرها في متصفحك دون رفعها للإنترنت.</div>
         
         <div class="drop-zone" id="dz-img" onclick="document.getElementById('fi-img').click()">
             <span class="drop-icon">🖼️</span>
             <div class="drop-title">انقر أو اسحب الصورة هنا للفحص</div>
-            <div class="drop-sub">يدعم JPEG, PNG, WEBP</div>
-            <input type="file" id="fi-img" accept="image/jpeg,image/png,image/webp,image/gif" style="display:none">
+            <div class="drop-sub">يدعم JPEG, PNG, WEBP, HEIC</div>
+            <input type="file" id="fi-img" accept="image/*" style="display:none">
         </div>
 
         <div id="threat-panel" class="threat-panel">
             <div class="threat-head">
-                <span>التقرير الأمني للبيانات المخفية</span>
+                <span>تقرير البيانات الوصفية (Metadata)</span>
                 <span id="badge" class="badge">جاري الفحص…</span>
             </div>
             <div id="threat-body" class="threat-body"></div>
         </div>
 
         <div id="preview-wrap" class="preview-wrap">
-            <div style="color:var(--primary);font-weight:800;margin-bottom:1rem;font-size:1.1rem" id="status-cleaned">✅ الصورة الآن مُطهرة وآمنة للمشاركة</div>
+            <div style="color:var(--primary);font-weight:800;margin-bottom:1rem;font-size:1rem" id="status-cleaned">✅ الصورة الآن مُطهرة تماماً وآمنة للمشاركة</div>
             <img id="img-preview" class="img-preview" alt="صورة مُطهَّرة">
             <button class="btn" id="btn-dl">⬇️ حفظ الصورة النظيفة</button>
-            <div style="display:flex;gap:10px;">
+            <div style="display:flex;gap:8px;">
                 <button class="btn ghost" id="btn-to-send" style="flex:1;font-size:0.9rem;">📡 إرسال P2P</button>
                 <button class="btn purple-ghost" id="btn-to-steg" style="flex:1;font-size:0.9rem;">🔏 إضافة بصمة</button>
             </div>
@@ -293,31 +289,43 @@ input[type="file"].file-styled::-webkit-file-upload-button:hover { background: v
 
     <!-- ══ 2. بصمة رقمية (Steganography) ══ -->
     <section id="view-steg" class="view">
-        <div class="info purple-info">🔏 <b>البصمة الخفية:</b> دسّ نص أو حقوق ملكية داخل بكسلات الصورة بدون تغيير شكلها.<br>⚠️ <b>تنبيه:</b> إرسال الصورة عبر الواتساب كصورة عادية سيدمر البصمة بسبب الضغط، أرسلها كـ "ملف".</div>
+        <div class="info purple-info">🔏 <b>البصمة الخفية:</b> دسّ حقوقك أو رسالة داخل بكسلات الصورة.<br>⚠️ <b>تنبيه:</b> يجب إرسال الصورة "كملف"، مشاركتها كصورة عادية في واتساب سيدمر البصمة بسبب الضغط.</div>
 
         <div class="p2p-box">
-            <div class="step-title"><i>1️⃣</i> تضمين رسالة سرية</div>
-            <div class="drop-zone" id="dz-steg" onclick="document.getElementById('fi-steg').click()" style="padding:1.5rem 1rem">
-                <div class="drop-title" style="font-size:0.95rem">اختر صورة (سحب وإفلات أو نقر)</div>
-                <input type="file" id="fi-steg" accept="image/jpeg,image/png,image/webp" style="display:none">
+            <div class="step-title"><i>1️⃣</i> حقن رسالة سرية</div>
+            <div class="drop-zone sm" id="dz-steg" onclick="document.getElementById('fi-steg').click()">
+                <span class="drop-icon" style="font-size:1.8rem">📥</span>
+                <div class="drop-title" style="font-size:0.9rem">اختر صورة للحَقن (سحب أو نقر)</div>
+                <input type="file" id="fi-steg" accept="image/*" style="display:none">
             </div>
             <img id="steg-src-preview" class="steg-preview" alt="صورة البصمة">
+            
             <textarea class="steg-textarea" id="steg-text" placeholder="اكتب النص السري هنا (حقوق، رسالة خاصة)..." maxlength="5000"></textarea>
             
-            <label style="font-size:0.85rem;color:var(--muted);margin-bottom:0.5rem;display:block;font-weight:700;">صلابة الدمج (التأثير على الدقة):</label>
-            <div class="steg-strength">
-                <div class="strength-btn active" data-bits="1">خفية جداً (أقل سعة)</div>
-                <div class="strength-btn" data-bits="2">متوازنة</div>
-                <div class="strength-btn" data-bits="3">سعة عالية (تأثير طفيف)</div>
+            <div class="file-settings">
+                <input type="text" id="steg-filename" class="steg-input" placeholder="اسم الملف (اختياري)">
+                <select id="steg-ext" class="steg-select">
+                    <option value="png">.png (يحفظ البصمة - موصى به)</option>
+                    <option value="bmp">.bmp (خام - حجم ضخم)</option>
+                </select>
             </div>
-            <button class="btn purple-ghost" id="btn-embed">🔏 حقن البصمة وحفظ كـ PNG</button>
+
+            <label style="font-size:0.8rem;color:var(--muted);margin-bottom:0.5rem;display:block;font-weight:700;">صلابة الدمج وتأثيرها على الألوان:</label>
+            <div class="steg-strength">
+                <div class="strength-btn active" data-bits="1">خفية جداً (1-Bit)</div>
+                <div class="strength-btn" data-bits="2">متوازنة (2-Bit)</div>
+                <div class="strength-btn" data-bits="3">سعة عالية (3-Bit)</div>
+            </div>
+            <button class="btn purple-ghost" id="btn-embed">🔏 حقن البصمة وتنزيل</button>
         </div>
 
         <div class="p2p-box">
             <div class="step-title"><i>2️⃣</i> استخراج بصمة سابقة</div>
-            <div class="drop-zone" id="dz-extract" onclick="document.getElementById('fi-extract').click()" style="padding:1.5rem 1rem">
-                <div class="drop-title" style="font-size:0.95rem">اختر الصورة المدمجة للفحص</div>
-                <input type="file" id="fi-extract" accept="image/png,image/webp,image/bmp" style="display:none">
+            <div class="drop-zone sm" id="dz-extract" onclick="document.getElementById('fi-extract').click()">
+                <span class="drop-icon" style="font-size:1.8rem">🔍</span>
+                <div class="drop-title" style="font-size:0.9rem">اختر الصورة المدمجة للفحص</div>
+                <!-- يقبل جميع الصور لضمان الفحص حتى لو تم تغيير الصيغة -->
+                <input type="file" id="fi-extract" accept="image/*" style="display:none">
             </div>
             <div id="extract-out" class="extract-out"></div>
         </div>
@@ -325,11 +333,16 @@ input[type="file"].file-styled::-webkit-file-upload-button:hover { background: v
 
     <!-- ══ 3. إرسال P2P ══ -->
     <section id="view-send" class="view">
-        <div class="info blue-info">🛡️ <b>نقل P2P مباشر:</b> اتصال مباشر بجهاز المستلم. لا يوجد خوادم تخزين وسيطة. المتلقي سيرى عنوان الـ IP الخاص بك بشكل غير مباشر لتأسيس الاتصال.</div>
+        <div class="info blue-info">🛡️ <b>نقل P2P لامركزي:</b> اتصال نفق مباشر من جهازك لجهاز المستلم. لا يوجد خوادم تخزين وسيطة. المتلقي سيرى عنوان الـ IP الخاص بك بشكل غير مباشر (عبر WebRTC) لتأسيس الاتصال.</div>
         
         <div class="p2p-box" id="send-s1">
             <div class="step-title"><i>1️⃣</i> حدد الملف المراد إرساله</div>
-            <input type="file" id="p2p-fi" class="file-styled">
+            <div class="drop-zone sm" id="dz-send" onclick="document.getElementById('p2p-fi').click()" style="margin-bottom:1rem">
+                <span class="drop-icon" style="font-size:1.8rem">📄</span>
+                <div class="drop-title" style="font-size:0.9rem">اختر ملفاً أو اسحبه هنا</div>
+                <div class="file-name-display" id="send-file-name"></div>
+                <input type="file" id="p2p-fi" style="display:none">
+            </div>
             <button class="btn" id="btn-offer">🔑 إنشاء نفق آمن وتوليد كود</button>
         </div>
         
@@ -339,7 +352,7 @@ input[type="file"].file-styled::-webkit-file-upload-button:hover { background: v
                 <div class="short-code-display" id="sender-code">------</div>
                 <button class="btn ghost btn-sm" id="btn-copy-code" title="نسخ الكود">📋</button>
             </div>
-            <div style="color:var(--warning); text-align:center; font-weight:800; font-size:0.9rem;" id="wait-msg">⏳ بانتظار اتصال المستلم...</div>
+            <div style="color:var(--warning); text-align:center; font-weight:800; font-size:0.85rem;" id="wait-msg">⏳ بانتظار اتصال المستلم...</div>
         </div>
         
         <div class="progress-wrap" id="sp-wrap"><div class="progress-bar" id="sp-bar"></div><div class="progress-label" id="sp-lbl">0%</div></div>
@@ -350,7 +363,7 @@ input[type="file"].file-styled::-webkit-file-upload-button:hover { background: v
     <section id="view-receive" class="view">
         <div class="p2p-box">
             <div class="step-title">📥 استلام ملف سري</div>
-            <div class="info">📝 اطلب من المُرسل الكود (6 أحرف) وضعه هنا لفتح النفق واستلام الملف مباشرة.</div>
+            <div class="info">📝 اطلب الكود (6 أحرف) من المُرسل وضعه هنا لفتح النفق واستلام الملف مباشرة.</div>
             <input type="text" id="target-code-input" class="code-input-short" placeholder="XXXXXX" maxlength="6" autocomplete="off" spellcheck="false">
             <button class="btn" id="btn-connect">🔗 اتصال وجلب الملف</button>
         </div>
@@ -371,7 +384,7 @@ input[type="file"].file-styled::-webkit-file-upload-button:hover { background: v
 
 <script>
 /* ═══════════════════════════════════════════
-   المشتركات وأدوات الواجهة
+   أدوات عامة (UI / Events / Security)
 ═══════════════════════════════════════════ */
 let toastTimer;
 function toast(msg, type='ok') {
@@ -383,11 +396,17 @@ function toast(msg, type='ok') {
     toastTimer = setTimeout(() => t.className='toast', 4000);
 }
 
+// حماية من XSS عند عرض بيانات الـ EXIF
+function escapeHTML(str) {
+    if (typeof str !== 'string') return str;
+    return str.replace(/[&<>'"]/g, tag => ({
+        '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;'
+    }[tag]));
+}
+
 // التنقل بين الشاشات
 document.querySelectorAll('.nav-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-        switchTo(btn.dataset.view);
-    });
+    btn.addEventListener('click', () => switchTo(btn.dataset.view));
 });
 function switchTo(v) {
     document.querySelectorAll('.nav-btn').forEach(b => b.classList.toggle('active', b.dataset.view === v));
@@ -395,60 +414,65 @@ function switchTo(v) {
     if(v === 'receive') { setTimeout(() => document.getElementById('target-code-input').focus(), 100); }
 }
 
-// تفعيل Drag & Drop العام للمناطق
-function setupDragDrop(zoneId, inputId, callback) {
+// إعداد Drag & Drop الموحد لكل الـ Dropzones
+function setupDragDrop(zoneId, inputId, labelId = null) {
     const zone = document.getElementById(zoneId);
     const input = document.getElementById(inputId);
+    const label = labelId ? document.getElementById(labelId) : null;
     
-    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
-        zone.addEventListener(eventName, preventDefaults, false);
-    });
-    function preventDefaults(e) { e.preventDefault(); e.stopPropagation(); }
-    
-    ['dragenter', 'dragover'].forEach(eventName => {
-        zone.addEventListener(eventName, () => zone.classList.add('drag-over'), false);
-    });
-    ['dragleave', 'drop'].forEach(eventName => {
-        zone.addEventListener(eventName, () => zone.classList.remove('drag-over'), false);
-    });
+    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(evt => zone.addEventListener(evt, e => { e.preventDefault(); e.stopPropagation(); }, false));
+    ['dragenter', 'dragover'].forEach(evt => zone.addEventListener(evt, () => zone.classList.add('drag-over'), false));
+    ['dragleave', 'drop'].forEach(evt => zone.addEventListener(evt, () => zone.classList.remove('drag-over'), false));
     
     zone.addEventListener('drop', e => {
-        const dt = e.dataTransfer;
-        const files = dt.files;
-        if(files.length) {
-            input.files = files;
-            if(callback) callback(files[0]);
-            else input.dispatchEvent(new Event('change'));
+        if(e.dataTransfer.files.length) {
+            input.files = e.dataTransfer.files;
+            input.dispatchEvent(new Event('change'));
         }
     }, false);
+
+    // تحديث الاسم (إن وجد)
+    if(label) {
+        input.addEventListener('change', () => {
+            if(input.files.length) {
+                label.textContent = input.files[0].name;
+                label.style.display = 'inline-block';
+            }
+        });
+    }
 }
 
 setupDragDrop('dz-img', 'fi-img');
 setupDragDrop('dz-steg', 'fi-steg');
 setupDragDrop('dz-extract', 'fi-extract');
+setupDragDrop('dz-send', 'p2p-fi', 'send-file-name');
 
-
-// مولد كود 6 حروف نظيف (تجنب الحروف المتشابهة مثل O و 0)
 function generateShortID() {
     const chars = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789'; 
     let result = '';
-    for (let i = 0; i < 6; i++) {
-        result += chars.charAt(Math.floor(Math.random() * chars.length));
-    }
+    for (let i = 0; i < 6; i++) { result += chars.charAt(Math.floor(Math.random() * chars.length)); }
     return result;
 }
 
 /* ═══════════════════════════════════════════
-   1. التطهير وفحص EXIF باستخدام (exifr)
+   1. التطهير وفحص EXIF الموسع (exifr)
 ═══════════════════════════════════════════ */
 let cleanStateFile = null;
+
+// قاموس لترجمة الـ EXIF إلى العربية لسهولة فهم المستخدم
+const exifDict = {
+    Make: 'الشركة المصنعة', Model: 'طراز الكاميرا/الهاتف', Software: 'برنامج التعديل',
+    DateTimeOriginal: 'تاريخ الالتقاط الأصلي', CreateDate: 'تاريخ الإنشاء',
+    ModifyDate: 'تاريخ التعديل', latitude: 'خط العرض (GPS)', longitude: 'خط الطول (GPS)',
+    LensModel: 'طراز العدسة', FNumber: 'فتحة العدسة (F-Stop)', ExposureTime: 'سرعة الغالق',
+    ISO: 'حساسية الضوء (ISO)', FocalLength: 'البعد البؤري', ExifImageWidth: 'العرض الأصلي', ExifImageHeight: 'الطول الأصلي'
+};
 
 document.getElementById('fi-img').addEventListener('change', async e => {
     const file = e.target.files[0];
     if (!file) return;
     
-    // Reset UI
-    e.target.value = '';
+    // Reset
     const panel = document.getElementById('threat-panel');
     const body  = document.getElementById('threat-body');
     const badge = document.getElementById('badge');
@@ -456,42 +480,46 @@ document.getElementById('fi-img').addEventListener('change', async e => {
     document.getElementById('preview-wrap').style.display = 'none';
     
     panel.style.display = 'block';
-    body.innerHTML = '<div style="text-align:center;color:var(--muted)">🔍 جاري التحليل العميق للبيانات الوصفية (Metadata)...</div>';
+    body.innerHTML = '<div style="text-align:center;color:var(--muted)">🔍 جاري التحليل العميق للبيانات الوصفية...</div>';
     badge.textContent = 'يتم الفحص…'; badge.className = 'badge warn';
     document.getElementById('dz-img').style.display = 'none';
 
     try {
-        // استخراج EXIF شامل باستخدام المكتبة
         let exifData = await exifr.parse(file, {tiff: true, ifd0: true, exif: true, gps: true});
         
         if (exifData && Object.keys(exifData).length > 0) {
-            let html = '<div class="t-row"><span class="t-val bad" style="font-size:0.9rem">⚠️ تم اكتشاف البيانات الوصفية التالية، سيتم مسحها:</span></div>';
+            let html = '<div class="t-row"><span class="t-val bad" style="font-size:0.85rem">⚠️ تم اكتشاف مسارات حساسة مدمجة بالصورة، سيتم سحقها:</span></div>';
             
-            // فلترة وعرض البيانات بشكل جميل
             for (const [key, value] of Object.entries(exifData)) {
-                // تجاوز المصفوفات الطويلة جداً لعدم تكسير الـ UI
                 if (value instanceof Uint8Array || key === 'MakerNote' || key === 'UserComment') continue;
                 
+                let displayKey = exifDict[key] || escapeHTML(key);
                 let displayVal = value;
-                if (typeof value === 'object' && value !== null) displayVal = JSON.stringify(value);
+                
+                // معالجة قيم الـ GPS لو كانت مصفوفات
+                if (Array.isArray(value)) displayVal = value.map(v => typeof v === 'number' ? v.toFixed(4) : v).join(', ');
+                else if (typeof value === 'object' && value !== null) displayVal = JSON.stringify(value);
+                else if (typeof value === 'number' && !Number.isInteger(value)) displayVal = value.toFixed(4); // تقريب الكسور
+
+                displayVal = escapeHTML(String(displayVal));
                 
                 html += `<div class="t-row">
-                            <span class="t-label">${key}</span>
+                            <span class="t-label">${displayKey}</span>
                             <span class="t-val">${displayVal}</span>
                          </div>`;
             }
             body.innerHTML = html;
-            badge.textContent = 'تم كشف بيانات - سيتم التطهير'; badge.className = 'badge';
+            badge.textContent = 'خطر - سيتم التطهير'; badge.className = 'badge';
         } else {
-            body.innerHTML = '<div class="t-row"><span class="t-val" style="color:var(--primary)">✅ لم يتم العثور على مسارات GPS أو بيانات كاميرا. ولكن سيتم إعادة رسم الصورة لإحباط أي أكواد خبيثة أخرى.</span></div>';
+            body.innerHTML = '<div class="t-row"><span class="t-val" style="color:var(--primary)">✅ لم يتم العثور على بيانات وصفية (EXIF). ولكن سيتم إعادة رسم الصورة احتياطياً لإحباط أي ثغرات بكسلية.</span></div>';
             badge.textContent = 'نظيف مبدئياً'; badge.className = 'badge safe';
         }
     } catch (err) {
-        body.innerHTML = '<div class="t-row"><span class="t-val bad">تعذر القراءة الهيكلية. سيتم فرض التطهير بالإكراه.</span></div>';
+        body.innerHTML = '<div class="t-row"><span class="t-val bad">تعذر القراءة الهيكلية. سيتم فرض التطهير الآلي.</span></div>';
         badge.textContent = 'عملية قسرية'; badge.className = 'badge warn';
     }
 
-    // Canvas عملية التطهير الإجباري والآمن (تجريد تام)
+    // إعادة رسم الصورة (التطهير الإجباري)
     const reader = new FileReader();
     reader.onload = ev => {
         const img = new Image();
@@ -502,24 +530,22 @@ document.getElementById('fi-img').addEventListener('change', async e => {
             ctx.drawImage(img, 0, 0);
             c.toBlob(blob => {
                 if (!blob) return toast('خطأ في أبعاد الصورة!','err');
-                cleanStateFile = new File([blob], 'Cleaned_' + file.name.replace(/[^a-zA-Z0-9.\-]/g,'_'), { type: 'image/jpeg' });
+                cleanStateFile = new File([blob], 'Cleaned_SITR_' + file.name.replace(/[^a-zA-Z0-9.\-]/g,'_').replace(/\.[^/.]+$/, "") + '.jpg', { type: 'image/jpeg' });
                 document.getElementById('img-preview').src = URL.createObjectURL(blob);
                 document.getElementById('status-cleaned').style.display = 'block';
                 document.getElementById('preview-wrap').style.display = 'block';
-                toast('✨ نجاح تطهير واقتلاع مسارات الصورة','ok');
-            }, 'image/jpeg', 0.96);
+                toast('✨ نجاح تطهير الصورة','ok');
+            }, 'image/jpeg', 0.98); // جودة عالية
         };
-        img.onerror = () => { toast('عذراً، فشل قراءة الصورة، قد تكون تالفة.','err'); document.getElementById('dz-img').style.display = 'block'; };
+        img.onerror = () => { toast('الصورة تالفة أو غير مدعومة.','err'); document.getElementById('dz-img').style.display = 'flex'; panel.style.display = 'none'; };
         img.src = ev.target.result;
     };
     reader.readAsDataURL(file);
 });
 
-// أزرار ما بعد التطهير
 document.getElementById('btn-dl').addEventListener('click', () => {
     if (!cleanStateFile) return;
-    const a = document.createElement('a');
-    a.href = URL.createObjectURL(cleanStateFile);
+    const a = document.createElement('a'); a.href = URL.createObjectURL(cleanStateFile);
     a.download = cleanStateFile.name; a.click();
     setTimeout(() => URL.revokeObjectURL(a.href), 10000);
 });
@@ -527,7 +553,9 @@ document.getElementById('btn-dl').addEventListener('click', () => {
 document.getElementById('btn-to-send').addEventListener('click', () => {
     if (!cleanStateFile) return;
     const dt = new DataTransfer(); dt.items.add(cleanStateFile);
-    document.getElementById('p2p-fi').files = dt.files;
+    const p2pInput = document.getElementById('p2p-fi');
+    p2pInput.files = dt.files;
+    p2pInput.dispatchEvent(new Event('change')); // لتحديث الاسم في الـ Dropzone
     switchTo('send');
 });
 
@@ -536,7 +564,7 @@ document.getElementById('btn-to-steg').addEventListener('click', () => {
     document.getElementById('steg-src-preview').src = URL.createObjectURL(cleanStateFile);
     document.getElementById('steg-src-preview').style.display = 'block';
     document.getElementById('dz-steg').style.display = 'none';
-    window.currentStegFile = cleanStateFile; // حفظ بالحالة المحلية
+    window.currentStegFile = cleanStateFile;
     switchTo('steg');
 });
 
@@ -569,8 +597,11 @@ document.getElementById('fi-steg').addEventListener('change', e => {
 document.getElementById('btn-embed').addEventListener('click', () => {
     const file = window.currentStegFile;
     const msg  = document.getElementById('steg-text').value;
-    if (!file) return toast('اختر صورة للحقن أولاً','err');
-    if (!msg.trim()) return toast('أدخل نصاً لحقنه في البكسلات','err');
+    const customName = document.getElementById('steg-filename').value.trim().replace(/[^a-zA-Z0-9_\u0600-\u06FF\- ]/g, ''); // أمان الاسم
+    const ext = document.getElementById('steg-ext').value; // png أو bmp
+    
+    if (!file) return toast('اختر صورة للحقن أولاً','warn');
+    if (!msg.trim()) return toast('أدخل نصاً لحقنه في الصورة','warn');
 
     const reader = new FileReader();
     reader.onload = ev => {
@@ -585,12 +616,9 @@ document.getElementById('btn-embed').addEventListener('click', () => {
             const encoded = new TextEncoder().encode(msg);
             const fullLen = encoded.length;
             
-            // حساب السعة القصوى للصورة بناءً على المتانة
             const maxCapacity = Math.floor((data.length / 4) * stegBits / 8) - 3;
-            if (fullLen > maxCapacity) {
-                return toast(`النص طويل جداً! السعة القصوى لهذه الصورة: ${maxCapacity} بايت`,'err');
-            }
-            if (fullLen > 65535) return toast('تجاوزت الحد الأقصى للنظام (64KB)','err');
+            if (fullLen > maxCapacity) return toast(`النص طويل جداً! أقصى سعة: ${maxCapacity} بايت`,'err');
+            if (fullLen > 65535) return toast('تجاوزت الحد الأقصى (64KB)','err');
             
             const payload = new Uint8Array(3 + fullLen);
             payload[0] = stegBits; 
@@ -610,24 +638,27 @@ document.getElementById('btn-embed').addEventListener('click', () => {
             }
 
             ctx.putImageData(id, 0, 0);
+            
+            const mimeType = ext === 'bmp' ? 'image/bmp' : 'image/png';
             c.toBlob(blob => {
                 const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
-                a.download = 'Secured_SITR_' + Date.now() + '.png'; a.click(); // يجب أن تكون PNG
+                const finalName = customName ? `${customName}.${ext}` : `Secured_SITR_${Date.now()}.${ext}`;
+                a.download = finalName; a.click();
                 setTimeout(() => URL.revokeObjectURL(a.href), 15000);
-                toast('✅ تم دمج البصمة بنجاح وتحميلها كـ PNG.','ok');
-            }, 'image/png');
+                toast(`✅ تم دمج البصمة وحفظها بصيغة ${ext.toUpperCase()}`,'ok');
+            }, mimeType);
         };
         img.src = ev.target.result;
     };
     reader.readAsDataURL(file);
 });
 
-// استخراج البصمة
+// استخراج البصمة (يعمل مع أي امتداد يحاول المتصفح قراءته)
 document.getElementById('fi-extract').addEventListener('change', e => {
     const file = e.target.files[0]; if (!file) return;
     const out = document.getElementById('extract-out');
-    out.style.display = 'block'; out.style.color = 'var(--text)';
-    out.innerHTML = '⏳ جاري تشريح بكسلات الصورة...';
+    out.style.display = 'block'; out.style.color = 'var(--text)'; out.style.borderColor = 'var(--border)';
+    out.innerHTML = '⏳ جاري تشريح بكسلات الصورة للبحث عن البصمات...';
     
     const reader = new FileReader();
     reader.onload = ev => {
@@ -639,7 +670,6 @@ document.getElementById('fi-extract').addEventListener('change', e => {
             const data = ctx.getImageData(0, 0, c.width, c.height).data;
 
             let found = false;
-            // فحص المتانات الثلاثة المحتملة (1, 2, 3 bits)
             for (const bpp of [1, 2, 3]) {
                 const mask = (1 << bpp) - 1; const bits = [];
                 for (let p = 0; p < data.length / 4; p++) {
@@ -651,7 +681,6 @@ document.getElementById('fi-extract').addEventListener('change', e => {
                     let b = 0; for (let k = 0; k < 8; k++) b = (b << 1) | bits[i + k]; bytes.push(b);
                 }
                 
-                // تحقق من الترويسة (Header)
                 if (bytes[0] !== bpp) continue;
                 const len = (bytes[1] << 8) | bytes[2];
                 if (len > 65535 || len === 0 || len > bytes.length - 3) continue;
@@ -660,21 +689,21 @@ document.getElementById('fi-extract').addEventListener('change', e => {
                     const textArr = new Uint8Array(bytes.slice(3, 3 + len));
                     const text = new TextDecoder('utf-8', {fatal: true}).decode(textArr);
                     
-                    // استبعاد النصوص العشوائية (Gibberish)
                     if (/[^\x00-\x7F\u0600-\u06FF\u0020-\u007E\n\r]/.test(text) && !/[\u0600-\u06FF]/.test(text)) continue; 
                     
                     out.style.color = 'var(--primary)';
                     out.style.borderColor = 'var(--primary)';
-                    out.innerHTML = `<span style="color:var(--muted);font-size:0.75rem">✅ وجدت بصمة (صلابة: ${bpp}):</span><br/><br/>${text.replace(/\n/g, '<br>')}`;
+                    out.innerHTML = `<span style="color:var(--muted);font-size:0.75rem">✅ وجدت بصمة (صلابة: ${bpp}):</span><br/><br/>${escapeHTML(text).replace(/\n/g, '<br>')}`;
                     found = true; break;
-                } catch (e) { /* تجاهل أخطاء فك الترميز والمحاولة بالمتانة التالية */ }
+                } catch (e) { }
             }
             if (!found) { 
                 out.style.color = 'var(--danger)'; 
                 out.style.borderColor = 'var(--danger)';
-                out.innerHTML = '❌ لم يتم العثور على رسالة مخفية صالحة.<br><span style="font-size:0.8rem;color:var(--muted)">ربما الصورة نظيفة، أو تم إرسالها عبر تطبيق قام بضغطها فتُلفَت البصمة.</span>'; 
+                out.innerHTML = '❌ لم يتم العثور على رسالة مخفية صالحة.<br><span style="font-size:0.75rem;color:var(--muted)">إذا كانت الصورة بصيغة JPEG أو أُرسلت عبر تطبيق ضغط (كواتساب)، فقد تم تدمير البصمة.</span>'; 
             }
         };
+        img.onerror = () => { out.innerHTML = '❌ تعذر قراءة ملف الصورة.'; };
         img.src = ev.target.result;
     };
     reader.readAsDataURL(file);
@@ -684,28 +713,22 @@ document.getElementById('fi-extract').addEventListener('change', e => {
 /* ═══════════════════════════════════════════
    3. WebRTC P2P Transfer (نقل الملفات المباشر)
 ═══════════════════════════════════════════ */
-let myPeer = null;
-let p2pConn = null;
-const CHUNK_SIZE = 64 * 1024; // 64KB للشريحة (أكثر استقراراً للوايفاي)
+let myPeer = null; let p2pConn = null; const CHUNK_SIZE = 64 * 1024;
 
 function resetWebRTC() {
     if(p2pConn) { p2pConn.close(); p2pConn = null; }
     if(myPeer) { myPeer.destroy(); myPeer = null; }
 }
 
-// زر نسخ الكود
 document.getElementById('btn-copy-code').addEventListener('click', () => {
     const code = document.getElementById('sender-code').textContent;
-    if(code !== '------') {
-        navigator.clipboard.writeText(code);
-        toast('تم نسخ الكود!', 'ok');
-    }
+    if(code !== '------') { navigator.clipboard.writeText(code); toast('تم نسخ الكود!', 'ok'); }
 });
 
 /* ──── [ المُرسِـــل ] ──── */
 document.getElementById('btn-offer').addEventListener('click', () => {
     const file = document.getElementById('p2p-fi').files[0];
-    if (!file) return toast('يرجى تحديد ملف أو صورة للإرسال أولاً','warn');
+    if (!file) return toast('يرجى تحديد ملف للإرسال أولاً','warn');
 
     resetWebRTC();
     
@@ -713,50 +736,39 @@ document.getElementById('btn-offer').addEventListener('click', () => {
     const sendRoomId = generateShortID();
     document.getElementById('sender-code').textContent = sendRoomId;
     document.getElementById('send-s2').style.display = 'block';
-    document.getElementById('wait-msg').textContent = 'جاري حجز الرمز بالخادم الوسيط...';
+    document.getElementById('wait-msg').textContent = 'جاري حجز الرمز...';
     document.getElementById('s-status').textContent = '';
     document.getElementById('sp-wrap').style.display = 'none';
 
-    // استخدام STUN عام (ملاحظة: الـ IPs ستكون مرئية لكلا الطرفين)
-    myPeer = new Peer("SITR-" + sendRoomId, {
-        config: { 'iceServers': [
-            { url: 'stun:stun.l.google.com:19302' }
-        ]}
-    });
+    myPeer = new Peer("SITR-" + sendRoomId, { config: { 'iceServers': [{ url: 'stun:stun.l.google.com:19302' }] }});
 
     myPeer.on('open', (id) => {
-        document.getElementById('wait-msg').innerHTML = '✅ <span style="color:var(--primary)">النفق جاهز! أعطِ الكود أعلاه للمستلم.</span>';
+        document.getElementById('wait-msg').innerHTML = '✅ <span style="color:var(--primary)">النفق جاهز! أعطِ الكود للمستلم.</span>';
         document.getElementById('btn-offer').disabled = false;
     });
 
     myPeer.on('error', (err) => {
-        toast('حدث خطأ في شبكة التوجيه (STUN).', 'err');
+        toast('خطأ في شبكة التوجيه.', 'err');
         document.getElementById('btn-offer').disabled = false;
         document.getElementById('wait-msg').innerHTML = '<span style="color:var(--danger)">فشل حجز الغرفة. جرب مجدداً.</span>';
     });
 
     myPeer.on('connection', (conn) => {
-        document.getElementById('wait-msg').textContent = '🔗 تم ربط المستلم، جاري التجهيز للضخ...';
+        document.getElementById('wait-msg').textContent = '🔗 تم ربط المستلم، جاري التجهيز...';
         p2pConn = conn;
         
         p2pConn.on('open', () => {
-            document.getElementById('wait-msg').textContent = '🔒 النفق المشفر P2P مفتوح. يتم الإرسال...';
+            document.getElementById('wait-msg').textContent = '🔒 يتم إرسال الملف مشفراً (P2P)...';
             document.getElementById('sp-wrap').style.display = 'block';
             
-            p2pConn.send({
-                type: 'meta',
-                name: file.name,
-                size: file.size,
-                mime: file.type || 'application/octet-stream'
-            });
+            p2pConn.send({ type: 'meta', name: file.name, size: file.size, mime: file.type || 'application/octet-stream' });
 
-            let offset = 0;
-            const fr = new FileReader();
+            let offset = 0; const fr = new FileReader();
 
             const sendNextChunk = () => {
                 if (offset >= file.size) {
                     p2pConn.send({ type: 'eof' });
-                    document.getElementById('wait-msg').innerHTML = "<span style='color:var(--primary);'>✅ 🚀 اكتمل نقل الملف بأمان تام!</span>";
+                    document.getElementById('wait-msg').innerHTML = "<span style='color:var(--primary);'>✅ 🚀 اكتمل النقل بأمان!</span>";
                     document.getElementById('s-status').textContent = 'تم التسليم. يمكنك إغلاق النافذة.';
                     return;
                 }
@@ -773,104 +785,83 @@ document.getElementById('btn-offer').addEventListener('click', () => {
                     document.getElementById('sp-bar').style.width = pct + '%';
                     document.getElementById('sp-lbl').textContent = pct + '%';
                     
-                    // تحكم في التدفق (Flow Control) لتفادي انهيار الذاكرة
-                    if (p2pConn.dataChannel.bufferedAmount > CHUNK_SIZE * 8) {
-                        setTimeout(sendNextChunk, 50); 
-                    } else {
-                        sendNextChunk();
-                    }
+                    if (p2pConn.dataChannel.bufferedAmount > CHUNK_SIZE * 8) setTimeout(sendNextChunk, 50); 
+                    else sendNextChunk();
                 } catch (e) { 
-                    toast('توقف التدفق! (المتلقي أغلق النافذة أو انقطع اتصاله)', 'err'); 
+                    toast('انقطع اتصال المستلم فجأة!', 'err'); 
                     document.getElementById('wait-msg').textContent = '❌ انقطع الاتصال.';
                 }
             };
             sendNextChunk();
         });
 
-        p2pConn.on('close', () => {
-            toast('انقطع اتصال المستلم.', 'warn');
-        });
+        p2pConn.on('close', () => toast('غادر المستلم الغرفة.', 'warn'));
     });
 });
 
 /* ──── [ المستــقـبــل ] ──── */
 const targetInput = document.getElementById('target-code-input');
-targetInput.addEventListener('input', function() {
-    this.value = this.value.toUpperCase().replace(/[^A-Z0-9]/g, '');
-});
+targetInput.addEventListener('input', function() { this.value = this.value.toUpperCase().replace(/[^A-Z0-9]/g, ''); });
 
 document.getElementById('btn-connect').addEventListener('click', () => {
     const targetCode = targetInput.value.trim();
-    if (targetCode.length !== 6) return toast('الكود غير صحيح، يجب أن يتكون من 6 رموز بالضبط', 'warn');
+    if (targetCode.length !== 6) return toast('يجب أن يتكون الكود من 6 رموز بالضبط', 'warn');
 
     resetWebRTC();
     document.getElementById('btn-connect').disabled = true;
     document.getElementById('r-status').textContent = 'جاري البحث عن المُرسل...';
     document.getElementById('rp-wrap').style.display = 'none';
 
-    myPeer = new Peer({
-        config: { 'iceServers': [
-            { url: 'stun:stun.l.google.com:19302' }
-        ]}
-    });
+    myPeer = new Peer({ config: { 'iceServers': [{ url: 'stun:stun.l.google.com:19302' }] }});
 
-    myPeer.on('open', (myId) => {
-        document.getElementById('r-status').textContent = 'تم تحديد المسار، جاري الربط المباشر...';
+    myPeer.on('open', () => {
+        document.getElementById('r-status').textContent = 'جاري الربط المباشر...';
         p2pConn = myPeer.connect("SITR-" + targetCode, { reliable: true });
 
         p2pConn.on('open', () => {
-            document.getElementById('r-status').innerHTML = '<span style="color:var(--primary)">🔒 تم إنشاء النفق بنجاح. بانتظار استلام البيانات...</span>';
+            document.getElementById('r-status').innerHTML = '<span style="color:var(--primary)">🔒 تم إنشاء النفق. بانتظار البيانات...</span>';
             setupReceiverEvents();
         });
 
-        p2pConn.on('error', (err) => {
-            toast('تعذر الربط، الكود غير صحيح أو المُرسل غير متصل.', 'err');
+        p2pConn.on('error', () => {
+            toast('تعذر الربط، الكود خطأ أو المُرسل غير متصل.', 'err');
             document.getElementById('btn-connect').disabled = false;
         });
     });
 
-    myPeer.on('error', (err) => {
-        toast('خطأ في الشبكة.', 'err');
+    myPeer.on('error', () => {
+        toast('الرمز غير صالح أو تم استخدامه مسبقاً.', 'err');
         document.getElementById('r-status').textContent = 'فشل الربط!';
         document.getElementById('btn-connect').disabled = false;
     });
 });
 
 function setupReceiverEvents() {
-    let fileBuffer = [];
-    let receivedBytes = 0;
-    let fileMeta = null;
-
+    let fileBuffer = []; let receivedBytes = 0; let fileMeta = null;
     document.getElementById('rp-wrap').style.display = 'block';
 
     p2pConn.on('data', (data) => {
         if (data && data.type !== undefined) {
             if (data.type === 'meta') {
                 fileMeta = data;
-                // حماية من الملفات الضخمة جداً للـ RAM (تحذير فقط)
-                if(fileMeta.size > 500 * 1024 * 1024) toast('حجم الملف كبير جداً، قد يتأخر التنزيل.', 'warn');
-                document.getElementById('r-status').innerHTML = `⏳ <b>تحميل:</b> <span style="color:var(--blue)">${fileMeta.name}</span>`;
+                if(fileMeta.size > 300 * 1024 * 1024) toast('الملف كبير جداً، قد يأخذ بعض الوقت.', 'warn');
+                document.getElementById('r-status').innerHTML = `⏳ <b>تحميل:</b> <span style="color:var(--blue); word-break:break-all;">${escapeHTML(fileMeta.name)}</span>`;
             } else if (data.type === 'eof') {
-                // تجميع الملف وتحميله
                 const blob = new Blob(fileBuffer, { type: fileMeta?.mime || 'application/octet-stream' });
                 const url = URL.createObjectURL(blob);
                 
-                const a = document.createElement('a');
-                a.href = url; a.download = fileMeta?.name || 'SITR_Received_File';
+                const a = document.createElement('a'); a.href = url; a.download = fileMeta?.name || 'SITR_Received_File';
                 document.body.appendChild(a); a.click(); document.body.removeChild(a);
                 setTimeout(() => URL.revokeObjectURL(url), 10000);
                 
-                document.getElementById('r-status').innerHTML = "<span style='color:var(--primary);'>✅ اكتمل الاستلام بنجاح! تفقد مجلد التنزيلات.</span>";
+                document.getElementById('r-status').innerHTML = "<span style='color:var(--primary);'>✅ اكتمل الاستلام بنجاح! راجع التنزيلات.</span>";
                 
-                // تنظيف الرام
                 fileBuffer = []; receivedBytes = 0;
                 document.getElementById('btn-connect').disabled = false;
-                toast('🎉 اكتمل النقل السري بنجاح!', 'ok');
+                toast('🎉 اكتمل النقل السري!', 'ok');
             }
-        } 
-        else {
-            fileBuffer.push(data);
-            receivedBytes += data.byteLength;
+        } else {
+            fileBuffer.push(data); receivedBytes += data.byteLength;
             if (fileMeta && fileMeta.size > 0) {
                 const pct = Math.min(100, Math.round((receivedBytes / fileMeta.size) * 100));
                 document.getElementById('rp-bar').style.width = pct + '%';
@@ -881,8 +872,8 @@ function setupReceiverEvents() {
 
     p2pConn.on('close', () => {
         if(receivedBytes > 0 && receivedBytes < (fileMeta?.size || Infinity)) {
-            toast('انقطع النفق قبل اكتمال الملف!', 'err');
-            document.getElementById('r-status').textContent = '❌ فشل الاستلام: المُرسل قطع الاتصال.';
+            toast('انقطع النفق قبل اكتمال التنزيل!', 'err');
+            document.getElementById('r-status').textContent = '❌ فشل: المُرسل قطع الاتصال.';
         }
         document.getElementById('btn-connect').disabled = false;
     });
